@@ -1,8 +1,6 @@
-import sys
-import threading
-import time
+import sys, os, threading, time
 from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QWidget, QDesktopWidget
-from PyQt5.QtWidgets import QLabel, QTextEdit, QVBoxLayout, QHBoxLayout, QPlainTextEdit
+from PyQt5.QtWidgets import QLabel, QTextEdit, QVBoxLayout, QHBoxLayout, QFileDialog
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QDateTime, Qt
 from libpkg import tts
@@ -18,28 +16,33 @@ class centWidget(QWidget):
         # >>> text editor settings
         self.te = QTextEdit()
         self.te.setAcceptRichText(False)
-        self.lbl_textCnt = QLabel('0 자')
+        self.lbl_teCnt = QLabel('0 자')
+        self.lbl_bteCnt = QLabel('0 자')
         self.te.textChanged.connect(self.text_changed)
 
         self.bte = QTextEdit()
-        self.bte.setAcceptRichText(False)
+        self.bte.setReadOnly(True)
+
+        self.teVBox = QVBoxLayout()
+        self.teVBox.addWidget(self.te)
+        self.teVBox.addWidget(self.lbl_teCnt, alignment=Qt.AlignLeft)
+
+        self.bteVBox = QVBoxLayout()
+        self.bteVBox.addWidget(self.bte)
+        self.bteVBox.addWidget(self.lbl_bteCnt, alignment=Qt.AlignRight)
 
         self.textHBox = QHBoxLayout()
-        self.textHBox.addWidget(self.te)
-        self.textHBox.addWidget(self.bte)
-
-        self.textVBox = QVBoxLayout()
-        self.textVBox.addLayout(self.textHBox)
-        self.textVBox.addWidget(self.lbl_textCnt, alignment=Qt.AlignRight)
+        self.textHBox.addLayout(self.teVBox)
+        self.textHBox.addLayout(self.bteVBox)
 
         self.mainHBox = QHBoxLayout()
-        self.mainHBox.addLayout(self.textVBox)
+        self.mainHBox.addLayout(self.textHBox)
         self.setLayout(self.mainHBox)
         # <<< text editor settings
 
     def text_changed(self):
-        text =  self.te.toPlainText()
-        self.lbl_textCnt.setText(str(len(text))+' 자')
+        self.lbl_teCnt.setText(str(len(self.te.toPlainText())) + ' 자')
+        self.lbl_bteCnt.setText(str(len(self.bte.toPlainText())) + '자')
         try:
             self.bte.setText(self.braille_str(kor_to_braille.translate(self.te.toPlainText())))
         except:
@@ -52,6 +55,9 @@ class centWidget(QWidget):
        json_format_braille = json
        return "".join(list(map(self.to_braille, json_format_braille)))
 
+
+
+
 class mainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -61,7 +67,9 @@ class mainWindow(QMainWindow):
         self.setWindowTitle('Dot  ::  designed by d2h10s') # set window title
         self.setWindowIcon(QIcon('icon/printer.png')) # set window icon
 
-        self.statusBar().showMessage('Ready') # set status bar message
+        self.statMsg = 'Ready'
+        self.timeMsg = QDateTime.currentDateTime().toString(Qt.DefaultLocaleLongDate)
+        self.statusBar().showMessage(self.timeMsg + self.statMsg) # set status bar message
 
         # >>> Program exit Action
         exitAction = QAction(QIcon('icon/exit.png'), '종료', self)
@@ -76,16 +84,20 @@ class mainWindow(QMainWindow):
         saveAction.setShortcut('Alt+s')
         saveAction.setStatusTip('텍스트 저장')
         saveAction.triggered.connect(self.text_save)
+        # <<< text Save Action
+
         # >>> menu bar settings
         menubar = self.menuBar()
         menubar.setNativeMenuBar(False)
         filemenu = menubar.addMenu('&File')
         filemenu.addAction(exitAction)
+        filemenu.addAction(saveAction)
         # <<< menu bar settings
 
         # >>> tool bar settings
         self.toolbar = self.addToolBar('종료')
         self.toolbar.addAction(exitAction)
+        self.toolbar.addAction(saveAction)
         # <<< tool bar settings
 
         # >>> Thread Setting
@@ -95,7 +107,8 @@ class mainWindow(QMainWindow):
         t1.start()
         # <<< Thread Setting
 
-        self.setCentralWidget(centWidget())
+        self.centralWidget = centWidget()
+        self.setCentralWidget(self.centralWidget)
         self.resize(1280, 720) # set window size
         self.center() # make window center
         self.show()
@@ -109,11 +122,19 @@ class mainWindow(QMainWindow):
     def showDate(self):
         # if you use timer instead of sleep, the app may crash
         while True:
-            self.statusBar().showMessage(QDateTime.currentDateTime().toString(Qt.DefaultLocaleLongDate))
+            self.timeMsg = QDateTime.currentDateTime().toString(Qt.DefaultLocaleLongDate)
+            self.statusBar().showMessage(self.timeMsg + '\t' + self.statMsg)
             time.sleep(0.9)
 
     def text_save(self):
-        
+        desktopAddr = os.path.join(os.path.expanduser('~'),'Desktop') # get user's destop address regardless of os
+        fname, _ = QFileDialog.getSaveFileName(self, caption='Save File', directory=desktopAddr)
+        if not fname:
+            self.statMsg = '저장을 실패하였습니다.'
+            return
+        with open(file=fname, mode='w') as f:
+            f.write(self.centralWidget.te.toPlainText())
+        self.statMsg = '저장을 성공하였습니다.'
 
 
 if __name__ == '__main__':
