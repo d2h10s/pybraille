@@ -6,7 +6,7 @@ from PyQt5.QtCore import QDateTime, Qt
 from libpkg import tts
 from translator import kor_to_braille
 
-
+lock = threading.Lock()
 
 class centWidget(QWidget):
     def __init__(self):
@@ -86,18 +86,27 @@ class mainWindow(QMainWindow):
         saveAction.triggered.connect(self.text_save)
         # <<< text Save Action
 
+        # >>> TTS Action
+        ttsAction = QAction(QIcon('icon/tts.png'), 'TTS', self)
+        ttsAction.setShortcut('Ctrl+t')
+        ttsAction.setStatusTip('입력한 텍스트를 음성으로 읽기')
+        ttsAction.triggered.connect(self.tts)
+        # <<< TTS Action
+
         # >>> menu bar settings
         menubar = self.menuBar()
         menubar.setNativeMenuBar(False)
         filemenu = menubar.addMenu('&File')
         filemenu.addAction(exitAction)
         filemenu.addAction(saveAction)
+        filemenu.addAction(ttsAction)
         # <<< menu bar settings
 
         # >>> tool bar settings
         self.toolbar = self.addToolBar('종료')
         self.toolbar.addAction(exitAction)
         self.toolbar.addAction(saveAction)
+        self.toolbar.addAction(ttsAction)
         # <<< tool bar settings
 
         # >>> Thread Setting
@@ -120,11 +129,13 @@ class mainWindow(QMainWindow):
         self.move(qr.topLeft()) # move window to monitor's center
 
     def showDate(self):
+        lock.acquire()
         # if you use timer instead of sleep, the app may crash
         while True:
             self.timeMsg = QDateTime.currentDateTime().toString(Qt.DefaultLocaleLongDate)
             self.statusBar().showMessage(self.timeMsg + '\t' + self.statMsg)
             time.sleep(0.9)
+        lock.release()
 
     def text_save(self):
         desktopAddr = os.path.join(os.path.expanduser('~'),'Desktop') # get user's destop address regardless of os
@@ -135,6 +146,9 @@ class mainWindow(QMainWindow):
         with open(file=fname, mode='w') as f:
             f.write(self.centralWidget.te.toPlainText())
         self.statMsg = '저장을 성공하였습니다.'
+
+    def tts(self):
+        tts.text2speech(self.centralWidget.te.toPlainText())
 
 
 if __name__ == '__main__':
