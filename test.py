@@ -1,5 +1,2 @@
-a = 3
-b = str(a)
-print(b)
-c = int(b)
-print(c)
+a = [False]*10
+print(a)

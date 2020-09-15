@@ -4,7 +4,7 @@ import sys
 import os
 sys.path.append('..')
 
-fname = 'data/tts'
+fname = 'data/TTS'
 
 def break_ko_en(text) -> list:
     msg = []
