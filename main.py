@@ -1,10 +1,11 @@
 import sys, os, threading
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QWidget, QDesktopWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QWidget, QDesktopWidget, QSlider
 from PyQt5.QtWidgets import QLabel, QTextEdit, QVBoxLayout, QHBoxLayout, QFileDialog, QComboBox, QPushButton
 from PyQt5.QtGui import QIcon, QFont
-from PyQt5.QtCore import QDateTime, Qt, QTimer
+from PyQt5.QtCore import QDateTime, Qt, QSize, QTimer
 from libpkg import tts
 from translator import kor_to_braille
+from playsound import playsound
 
 lock = threading.Lock()
 
@@ -12,6 +13,7 @@ class historyWidget(QWidget):
     def __init__(self):
         super().__init__()
 
+        self.setWindowTitle('TTS Player')
         self.fname = 'data/TTS'
         self.isfile = [False] * 11
         self.cb = QComboBox(self)
@@ -28,14 +30,67 @@ class historyWidget(QWidget):
         self.lbl_caution = QLabel('※1번이 가장 최근의 TTS 파일입니다.', self)
         self.lbl_caution.move(10, 465)
 
-        self.btn_play = QPushButton('Play')
-        self.resize(680, 480)  # set window size
+        # >>> slider Setting
+        self.lbl_start = QLabel('0:00', self)
+        self.lbl_end = QLabel('0:00', self)
+        self.lbl_start.move((self.width()-400)/2 - 30, 350)
+        self.lbl_end.move(self.width() - (self.width() - 400) / 2 + 20, 350)
+        self.sld = QSlider(Qt.Horizontal, self)
+        self.sld.setFixedWidth(400)
+        self.sld.move((self.width()-400)/2, 350)
+        self.sld.setSingleStep(1)
+        # <<< Slider Setting
+
+        # >>> Play Button Setting
+        self.btn_pause = QPushButton('', self)
+        self.btn_pause.setIcon(QIcon('icon/pause.png'))
+        self.btn_pause.setIconSize(QSize(40, 40))
+        self.btn_pause.setStyleSheet('QPushButton{border: 0px solid;}')
+        self.btn_pause.clicked.connect(self.pause)
+        self.btn_pause.move(170, 400)
+
+        self.btn_play = QPushButton('', self)
+        self.btn_play.setIcon(QIcon('icon/play.png'))
+        self.btn_play.setIconSize(QSize(40, 40))
+        self.btn_play.setStyleSheet('QPushButton{border: 0px solid;}')
+        self.btn_play.clicked.connect(self.play)
+        self.btn_play.move(340, 400)
+
+        self.btn_stop = QPushButton('', self)
+        self.btn_stop.setIcon(QIcon('icon/stop.png'))
+        self.btn_stop.setIconSize(QSize(40, 40))
+        self.btn_stop.setStyleSheet('QPushButton{border: 0px solid;}')
+        self.btn_stop.clicked.connect(self.stop)
+        self.btn_stop.move(510, 400)
+        # <<< Play Button Setting
+
+        self.setFixedSize(680, 480)  # set window size
         mainWindow.center(self)
         self.show()
 
     def onActivated(self, text):
-            pass
+        self.fname = text
+        print(self.fname)
 
+
+    def play(self):
+        # >>> Thread Setting
+        # if thread is daemon thread, when main thread is terminated immediately daemon thread is killed regardless of end of task
+        self.t1 = threading.Thread(target=self.play_music)
+        self.t1.daemon = True  # make t1 thread daemon thread
+        # <<< Thread Setting
+        self.t1.start()
+
+    def pause(self):
+        pass
+
+    def stop(self):
+        pass
+
+    def play_music(self):
+        lock.acquire()
+        playsound('data/' + self.fname)
+        lock.release()
 
 
 class centWidget(QWidget):
