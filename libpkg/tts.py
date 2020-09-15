@@ -1,10 +1,10 @@
 from gtts import gTTS
 from playsound import playsound
 import sys
+import os
 sys.path.append('..')
 
-fname = 'data/tts.mp3'
-
+fname = 'data/tts'
 
 def break_ko_en(text) -> list:
     msg = []
@@ -32,9 +32,22 @@ def break_ko_en(text) -> list:
 
 
 def text2speech(text) -> None:
+    for fidx in range(1,12):
+        if not os.path.isfile(fname + str(fidx) + '.mp3'):
+            fidx -= 1
+            break
+
+    if fidx > 9:
+        os.remove(fname + str(fidx) + '.mp3')
+        fidx -= 1
+
+    while fidx > 0:
+        os.rename(fname + str(fidx) + '.mp3', fname + str(fidx + 1) + '.mp3')
+        fidx = fidx - 1
+
     msg = break_ko_en(text)
-    with open(fname, 'wb') as f:
+    with open(fname + '1.mp3', 'wb') as f:
         for t in msg:
             tts = gTTS(text=t[1], lang=t[0])
             tts.write_to_fp(f)
-    playsound(fname)
+    playsound(fname + '1.mp3')
