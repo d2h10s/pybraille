@@ -1,6 +1,5 @@
 from . import map_kor_to_braille
 import re
-import serial
 
 UNRECOGNIZED = '?'
 
@@ -261,6 +260,7 @@ def check_punctuation(word, index, braille):
 def check_character(word, index, braille):
     key = word[index]
     if re.match('[a-zA-Z]', key) is not None:
+        braille.append({'braille' : map_kor_to_braille.english.get(key), 'category' : '영어', 'original' : key})
         check_Dot(key)
     if re.match('.*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*', key) is not None:
         char = ord(key) - BASE_CODE
@@ -275,14 +275,14 @@ def check_character(word, index, braille):
             braille.append({'braille' : map_kor_to_braille.JONGSUNG_letters.get(JONGSUNG_LIST[char3]), 'category' : '종성', 'original' : JONGSUNG_LIST[char3]})
             JONGSUNG_dummy=JONGSUNG_DOT.get(JONGSUNG_LIST[char3])
             check_dim(JONGSUNG_dummy)
-            print(JONGSUNG_LIST[char3], ':', JONGSUNG_DOT.get(JONGSUNG_LIST[char3]))
+            #print(JONGSUNG_LIST[char3], ':', JONGSUNG_DOT.get(JONGSUNG_LIST[char3]))
         return True
     return False
 
 def check_Dot(text):
     dot=Dot_LIST.get(text)
     check_dim(dot)
-    print(text,':',dot)
+    #print(text,':',dot)
 
 def check_dim(list):
     if len(list) == 2:
@@ -296,7 +296,9 @@ def check_dim(list):
 def translate(string):
     words = extract_words(string)
     braille = []
-    Row_Data = []
+    Row_Data1 = []
+    Row_Data2 = []
+    Row_Data3 = []
     for word in words:
         i = 0
         while (i < len(word)):
@@ -313,11 +315,14 @@ def translate(string):
             check_character(word, i, braille)
             i += 1
         braille.append({'braille' : ' ', 'category' : 'space', 'original' : ' '})
-    print(Dot_bit)
-    print(len(Dot_bit))
-    Row_Data = Dot_bit[0:len(Dot_bit):3]
+        Dot_bit.extend([0,0,0,0,0,0])
+        #print(' ',':',[0,0,0,0,0,0])
+    #print(Dot_bit)
+    #print(len(Dot_bit))
+    Row_Data1 = Dot_bit[0:len(Dot_bit):3]
+    Row_Data2 = Dot_bit[1:len(Dot_bit):3]
+    Row_Data3 = Dot_bit[2:len(Dot_bit):3]
 
-    print(Row_Data)
     return braille
 
 if __name__ == "__main__":
