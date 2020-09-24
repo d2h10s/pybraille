@@ -343,7 +343,8 @@ class mainWindow(QMainWindow):
         self.centralWidget.bte.setFont(self.font)  # setFontPointSize(10)
 
     def print(self):
-        pass
+        kor_to_braille.transmit(self.centralWidget.te.toPlainText())
+        self.statMsg = '프린트 통신에 실패하였습니다.'
 
 
 if __name__ == '__main__':

@@ -299,6 +299,9 @@ def translate(string):
     Row_Data1 = []
     Row_Data2 = []
     Row_Data3 = []
+    if words =='':
+        return ''
+
     for word in words:
         i = 0
         while (i < len(word)):
@@ -324,6 +327,3 @@ def translate(string):
     Row_Data3 = Dot_bit[2:len(Dot_bit):3]
 
     return braille
-
-if __name__ == "__main__":
-    print(translate("오늘 밤에도 별은 바람에 스치운다."))
