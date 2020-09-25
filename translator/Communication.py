@@ -7,10 +7,10 @@ mbed = serial.Serial(port='COM4', baudrate=115200)
 STX = 0x02
 ETX = 0x03
 COMMA = 0x2C
-ACK = b'6'
-NAK = 0x15
+ACK = bytes(bytearray([0x06]))
+NAK = bytes(bytearray([0x15]))
 CMD_PRINT = 0x01
-COMPLETE = b'1'
+COMPLETE = bytes(bytearray([0x19]))
 
 def CS(data):
     return (~sum(data)) & 0xFF
