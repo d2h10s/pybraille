@@ -1,9 +1,8 @@
 import serial
-#from . import kor_to_braille
 import translator.kor_to_braille as kor_to_braille
-import time
 mbed = serial.Serial(port='COM4', baudrate=115200)
 
+## >>> communication ascii code
 STX = 0x02
 ETX = 0x03
 COMMA = 0x2C
@@ -11,6 +10,10 @@ ACK = bytes(bytearray([0x06]))
 NAK = bytes(bytearray([0x15]))
 CMD_PRINT = 0x01
 COMPLETE = bytes(bytearray([0x19]))
+## <<< communication ascii code
+
+### Flag
+COM_COMPLETE = True
 
 def CS(data):
     return (~sum(data)) & 0xFF
@@ -35,6 +38,8 @@ def Bit_shift(bit_data): # [1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1
 
 
 def Data_Send(string):
+    global COM_COMPLETE
+    COM_COMPLETE = False
     kor_to_braille.translate(string)
     Send_list = kor_to_braille.Dot_bit
     Row_Data = [0, 0, 0]
@@ -73,5 +78,4 @@ def Data_Send(string):
                 print(a)
         else:
             print(a)
-
-Data_Send("안녕하세요 현우입니다. 너네 집은 어디입니까.")
+    COM_COMPLETE = True

@@ -1,12 +1,12 @@
 import sys, os, threading
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QWidget, QDesktopWidget, QSlider
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QWidget, QDesktopWidget, QSlider, QMessageBox
 from PyQt5.QtWidgets import QLabel, QTextEdit, QVBoxLayout, QHBoxLayout, QFileDialog, QComboBox, QPushButton
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import QDateTime, Qt, QSize, QTimer
 from libpkg import tts
-from translator import kor_to_braille
 from playsound import playsound
-
+from translator import kor_to_braille
+from translator.Communication import *
 lock = threading.Lock()
 
 class historyWidget(QWidget):
@@ -296,15 +296,16 @@ class mainWindow(QMainWindow):
             self.statMsg = '열기를 실패하였습니다.'
 
 
-    def text_save(self):
+    def text_save(self, event):
         desktopAddr = os.path.join(os.path.expanduser('~'),'Desktop') # get user's destop address regardless of os
         fname, _ = QFileDialog.getSaveFileName(self, caption='Save File', directory=desktopAddr)
         try:
             with open(file=fname, mode='w') as f:
                 f.write(self.centralWidget.te.toPlainText())
-            self.statMsg = '저장을 성공하였습니다.'
+            QMessageBox.question(self, '저장', '저장이 완료되었습니다.', QMessageBox.Yes, QMessageBox.Yes)
+            event.accept()
         except:
-            self.statMsg = '저장을 실패하였습니다.'
+            QMessageBox.question(self, '저장', '저장이 실패하였습니다.', QMessageBox.Yes, QMessageBox.Yes)
 
     def tts_btn(self):
         # >>> Thread Setting
@@ -318,13 +319,11 @@ class mainWindow(QMainWindow):
         lock.acquire()
         text = self.centralWidget.te.toPlainText()
         tts.text2speech(text)
-        self.statMsg = 'TTS가 종료되었습니다.'
+        QMessageBox.question(self, 'TTS', 'TTS가 종료되었습니다.', QMessageBox.Yes, QMessageBox.Yes)
         lock.release()
 
     def history(self):
         self.histWidget = historyWidget()
-
-
 
     def font_dec(self):
         self.fsize -= 2
@@ -343,8 +342,17 @@ class mainWindow(QMainWindow):
         self.centralWidget.bte.setFont(self.font)  # setFontPointSize(10)
 
     def print(self):
-        kor_to_braille.transmit(self.centralWidget.te.toPlainText())
-        self.statMsg = '프린트 통신에 실패하였습니다.'
+        global COM_COMPLETE
+        if not COM_COMPLETE:
+            QMessageBox.question(self, '프린트', '이미 프린트 중 입니다.', QMessageBox.Yes, QMessageBox.Yes)
+            return
+        self.t2 = threading.Thread(target=Data_Send, args=(self.centralWidget.te.toPlainText(),))
+        self.t2.daemon = False # 모든 프로그램의 작업이 끝난 후 타이밍 맞추어 종료
+        try:
+            self.t2.start()
+        except:
+            QMessageBox.question(self, '프린트', '프린트 중 오류가 발생하였습니다.', QMessageBox.Yes, QMessageBox.Yes)
+            COM_COMPLETE = True
 
 
 if __name__ == '__main__':
