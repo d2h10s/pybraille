@@ -1,11 +1,9 @@
 import sys, os, threading
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp, QWidget, QDesktopWidget, QSlider, QMessageBox
-from PyQt5.QtWidgets import QLabel, QTextEdit, QVBoxLayout, QHBoxLayout, QFileDialog, QComboBox, QPushButton
+from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import QDateTime, Qt, QSize, QTimer
 from libpkg import tts
 from playsound import playsound
-from translator import kor_to_braille
 from translator.Communication import *
 lock = threading.Lock()
 
@@ -72,7 +70,6 @@ class historyWidget(QWidget):
         self.fname = text
         print(self.fname)
 
-
     def play(self):
         # >>> Thread Setting
         # if thread is daemon thread, when main thread is terminated immediately daemon thread is killed regardless of end of task
@@ -137,9 +134,8 @@ class centWidget(QWidget):
 
     def braille_str(self, json):
        json_format_braille = json
+       print("".join(list(map(self.to_braille, json_format_braille))))
        return "".join(list(map(self.to_braille, json_format_braille)))
-
-
 
 
 class mainWindow(QMainWindow):
@@ -189,7 +185,7 @@ class mainWindow(QMainWindow):
 
         # >>> text open Action
         openAction = QAction(QIcon('icon/open.png'), '열기', self)
-        openAction.setShortcut('Alt+O')
+        openAction.setShortcut('Ctrl+O')
         openAction.setStatusTip('텍스트 열기(.txt 확장자만 가능합니다.)')
         openAction.triggered.connect(self.text_open)
         # <<< text open Action
@@ -209,7 +205,7 @@ class mainWindow(QMainWindow):
         # <<< TTS Action
 
         # >>> TTS History Action
-        ttshisAction = QAction(QIcon('icon/history.png'), 'History', self)
+        ttshisAction = QAction(QIcon('icon/history.png'), '기록', self)
         ttshisAction.setShortcut('Ctrl+h')
         ttshisAction.setStatusTip('최근 10개의 TTS 히스토리를 볼 수 있습니다.')
         ttshisAction.triggered.connect(self.history)
@@ -291,10 +287,11 @@ class mainWindow(QMainWindow):
             with open(file=fname, mode='r', encoding='utf-8') as f:
                 text = f.read()
                 self.centralWidget.te.setText(text)
+            self.msgbox(QMessageBox.Information, '확인', '열기를 성공하였습니다.', QMessageBox.Ok)
             self.statMsg = '열기를 성공하였습니다.'
         except:
+            self.msgbox(QMessageBox.Information, '오류', '열기를 실패하였습니다.', QMessageBox.Ok)
             self.statMsg = '열기를 실패하였습니다.'
-
 
     def text_save(self, event):
         desktopAddr = os.path.join(os.path.expanduser('~'),'Desktop') # get user's destop address regardless of os
@@ -302,15 +299,14 @@ class mainWindow(QMainWindow):
         try:
             with open(file=fname, mode='w') as f:
                 f.write(self.centralWidget.te.toPlainText())
-            QMessageBox.question(self, '저장', '저장이 완료되었습니다.', QMessageBox.Yes, QMessageBox.Yes)
-            event.accept()
+            self.msgbox(QMessageBox.Information, '확인', '저장하였습니다.', QMessageBox.Ok)
         except:
-            QMessageBox.question(self, '저장', '저장이 실패하였습니다.', QMessageBox.Yes, QMessageBox.Yes)
+            self.msgbox(QMessageBox.Information, '오류', '저장을 실패하였습니다.', QMessageBox.Ok)
 
     def tts_btn(self):
         # >>> Thread Setting
         # if thread is daemon thread, when main thread is terminated immediately daemon thread is killed regardless of end of task
-        self.t1 = threading.Thread(target=self.tts)
+        self.t1 = threading.Thread(target=(self.tts))
         self.t1.daemon = True  # make t1 thread daemon thread
         # <<< Thread Setting
         self.t1.start()
@@ -318,8 +314,10 @@ class mainWindow(QMainWindow):
     def tts(self):
         lock.acquire()
         text = self.centralWidget.te.toPlainText()
+        if len(text.strip()) < 1:
+            lock.release()
+            return
         tts.text2speech(text)
-        QMessageBox.question(self, 'TTS', 'TTS가 종료되었습니다.', QMessageBox.Yes, QMessageBox.Yes)
         lock.release()
 
     def history(self):
@@ -344,7 +342,7 @@ class mainWindow(QMainWindow):
     def print(self):
         global COM_COMPLETE
         if not COM_COMPLETE:
-            QMessageBox.question(self, '프린트', '이미 프린트 중 입니다.', QMessageBox.Yes, QMessageBox.Yes)
+            self.msgbox(QMessageBox.Warning, '오류', '이미 프린트 중입니다.')
             return
         self.t2 = threading.Thread(target=Data_Send, args=(self.centralWidget.te.toPlainText(),))
         self.t2.daemon = False # 모든 프로그램의 작업이 끝난 후 타이밍 맞추어 종료
@@ -353,6 +351,19 @@ class mainWindow(QMainWindow):
         except:
             QMessageBox.question(self, '프린트', '프린트 중 오류가 발생하였습니다.', QMessageBox.Yes, QMessageBox.Yes)
             COM_COMPLETE = True
+
+    def msgbox(self, seticon, title, text, btn):
+        msg = QMessageBox()
+        msg.setIcon(seticon)
+        msg.setWindowTitle(title)
+        msg.setText(text)
+        msg.setStandardButtons(btn)
+        return msg.exec_()
+        # QMessageBox.NoIcon : 값은 0 이며, 기본값이다. 메시지 박스에 아이콘을 표시
+        # QMessageBox.Information : 값은 1 이며, 느낌표 아이콘 표시
+        # QMessageBox.Warning : 값은 2 이며, 느낌표 아이콘에 배경이 노란색 삼각형 표시
+        # QMessageBox.Critial : 값은 3 이며, 오류를 나타낼 때 표시
+        # QMessageBox.Question : 값은 4 이며, 물음표 아이콘 표시
 
 
 if __name__ == '__main__':
