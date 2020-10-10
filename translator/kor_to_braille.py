@@ -275,14 +275,12 @@ def check_character(word, index, braille):
             braille.append({'braille' : map_kor_to_braille.JONGSUNG_letters.get(JONGSUNG_LIST[char3]), 'category' : '종성', 'original' : JONGSUNG_LIST[char3]})
             JONGSUNG_dummy=JONGSUNG_DOT.get(JONGSUNG_LIST[char3])
             check_dim(JONGSUNG_dummy)
-            #print(JONGSUNG_LIST[char3], ':', JONGSUNG_DOT.get(JONGSUNG_LIST[char3]))
         return True
     return False
 
 def check_Dot(text):
     dot=Dot_LIST.get(text)
     check_dim(dot)
-    #print(text,':',dot)
 
 def check_dim(list):
     if len(list) == 2:
@@ -296,9 +294,6 @@ def check_dim(list):
 def translate(string):
     words = extract_words(string)
     braille = []
-    Row_Data1 = []
-    Row_Data2 = []
-    Row_Data3 = []
     if words =='':
         return ''
 
@@ -319,11 +314,4 @@ def translate(string):
             i += 1
         braille.append({'braille' : ' ', 'category' : 'space', 'original' : ' '})
         Dot_bit.extend([0,0,0,0,0,0])
-        #print(' ',':',[0,0,0,0,0,0])
-    #print(Dot_bit)
-    #print(len(Dot_bit))
-    Row_Data1 = Dot_bit[0:len(Dot_bit):3]
-    Row_Data2 = Dot_bit[1:len(Dot_bit):3]
-    Row_Data3 = Dot_bit[2:len(Dot_bit):3]
-
     return braille
