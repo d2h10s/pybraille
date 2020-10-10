@@ -56,10 +56,12 @@ def Bit_shift(bit_data): # [1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1
 
 
 def Data_Send(string):
+    print(string)
     if not mbed.isOpen():
-        autoSerial()
-        if not mbed.isOpen():
-            return 0
+       autoSerial()
+       if not mbed.isOpen():
+           return 0
+    #mbed = serial.Serial(port='COM11', baudrate=115200, timeout=30)
     mbed.flush()
     kor_to_braille.translate(string)
     Send_list = kor_to_braille.Dot_bit
@@ -77,17 +79,18 @@ def Data_Send(string):
         temp_data = []
         for i in range(3):
             for j in range(start, end):
-                #print(start, end)
                 temp_data.append(hex_data[i][j])
-            if end -start < 4:
-                for _i in range(4 - end - start):
+            if end - start < 4:
+                for _i in range(4 - end + start):
                     temp_data.append(0x00);
+            # while len(temp_data) < 4*(i+1):
+            #     temp_data.append(0x00)
             if i < 2:
                 temp_data.append(COMMA)
 
         send_data = [STX, CMD_PRINT, len(temp_data)] + temp_data + [CS(temp_data), ETX] #보낼 데이터
-        #print([hex(x) for x in send_data])
-        #print([bin(x) for x in send_data])
+        print([hex(x) for x in send_data])
+        print([bin(x) for x in send_data])
         mbed.write(bytes(send_data))   #---송신
         print('송신 완료')
 
@@ -103,13 +106,11 @@ def Data_Send(string):
             print("프린트 완료까지 대기")
             a = mbed.read()        # 1줄 프린트 완료까지 대기
             if a == COMPLETE:
-                print("프린트끝")
+                print("한 줄 끝")
                 start += 4
                 end = min(end + 4, len(hex_data[0]))
             else:
                 print('failed', a)
         else:
             print(a)
-
-
-Data_Send("qqqqq")
+    print('프린트 완료')

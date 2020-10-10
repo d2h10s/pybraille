@@ -1,6 +1,8 @@
 from . import map_kor_to_braille
 import re
 
+Dot_bit = []
+
 UNRECOGNIZED = '?'
 
 open_quotes = True
@@ -210,7 +212,6 @@ JONGSUNG_DOT={
     'ㅄ': [[1,1,0,0,0,0], [0,0,1,0,0,0]],
     'ㅆ': [0,0,1,1,0,0],
 }
-Dot_bit = []
 
 def extract_words(string):
     words = string.split(" ")
@@ -283,6 +284,7 @@ def check_Dot(text):
     check_dim(dot)
 
 def check_dim(list):
+    global Dot_bit
     if len(list) == 2:
         dummy = list[0]
         dummy2= list[1]
@@ -292,10 +294,12 @@ def check_dim(list):
         Dot_bit.extend(list)
 
 def translate(string):
+    global Dot_bit
+    Dot_bit = []
+    if len(string.strip()) < 1:
+        return 0
     words = extract_words(string)
     braille = []
-    if words =='':
-        return ''
 
     for word in words:
         i = 0

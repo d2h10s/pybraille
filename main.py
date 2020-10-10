@@ -134,7 +134,6 @@ class centWidget(QWidget):
 
     def braille_str(self, json):
        json_format_braille = json
-       print("".join(list(map(self.to_braille, json_format_braille))))
        return "".join(list(map(self.to_braille, json_format_braille)))
 
 
@@ -340,17 +339,7 @@ class mainWindow(QMainWindow):
         self.centralWidget.bte.setFont(self.font)  # setFontPointSize(10)
 
     def print(self):
-        global COM_COMPLETE
-        if not COM_COMPLETE:
-            self.msgbox(QMessageBox.Warning, '오류', '이미 프린트 중입니다.')
-            return
-        self.t2 = threading.Thread(target=Data_Send, args=(self.centralWidget.te.toPlainText(),))
-        self.t2.daemon = False # 모든 프로그램의 작업이 끝난 후 타이밍 맞추어 종료
-        try:
-            self.t2.start()
-        except:
-            QMessageBox.question(self, '프린트', '프린트 중 오류가 발생하였습니다.', QMessageBox.Yes, QMessageBox.Yes)
-            COM_COMPLETE = True
+        Data_Send(self.centralWidget.te.toPlainText().strip())
 
     def msgbox(self, seticon, title, text, btn):
         msg = QMessageBox()
