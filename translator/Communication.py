@@ -56,7 +56,6 @@ def Bit_shift(bit_data): # [1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1
 
 
 def Data_Send(string):
-    print(string)
     if not mbed.isOpen():
        autoSerial()
        if not mbed.isOpen():
@@ -72,7 +71,9 @@ def Data_Send(string):
         Row_Data[i] = Send_list[i:len(Send_list):3]  # 1,2,3열의 데이터 생성
     for i in range(3):
         hex_data.append(Bit_shift(Row_Data[i])) # [[227, 132, 244, 99, 250, 228, 55, 198, 163, 91, 174, 24], [236, 124, 112, 223, 54, 27, 8, 65, 147, 167, 97, 11], [16, 113, 140, 16, 136, 33, 8, 134, 48, 136, 130, 69]]
-
+    for line in Row_Data:
+        print(line)
+    print(hex_data)
     start = 0
     end = min(4, len(hex_data[0]))
     while start < len(hex_data[0]):     #4b,4b,4b 로 끊어서 데이터 만들기
@@ -114,3 +115,5 @@ def Data_Send(string):
         else:
             print(a)
     print('프린트 완료')
+
+Data_Send('임베디드 소프트웨어 경진대회')
