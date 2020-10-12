@@ -71,6 +71,9 @@ class historyWidget(QWidget):
         print(self.fname)
 
     def play(self):
+        print(self.fname.find('mp3'))
+        if not self.fname:
+            return
         # >>> Thread Setting
         # if thread is daemon thread, when main thread is terminated immediately daemon thread is killed regardless of end of task
         self.t1 = threading.Thread(target=self.play_music)
@@ -123,18 +126,11 @@ class centWidget(QWidget):
 
     def text_changed(self):
         try:
-            self.bte.setText(self.braille_str(kor_to_braille.translate(self.te.toPlainText())))
+            self.bte.setText(kor_to_braille.translate(self.te.toPlainText()))
         except:
             pass
         self.lbl_teCnt.setText(str(len(self.te.toPlainText())) + ' 자')
         self.lbl_bteCnt.setText(str(len(self.bte.toPlainText())) + '자')
-
-    def to_braille(self, json):
-        return json["braille"]
-
-    def braille_str(self, json):
-       json_format_braille = json
-       return "".join(list(map(self.to_braille, json_format_braille)))
 
 
 class mainWindow(QMainWindow):
@@ -339,7 +335,10 @@ class mainWindow(QMainWindow):
         self.centralWidget.bte.setFont(self.font)  # setFontPointSize(10)
 
     def print(self):
-        Data_Send(self.centralWidget.te.toPlainText().strip())
+        self.t3 = threading.Thread(target=(Data_Send), args=(self.centralWidget.te.toPlainText().strip(),))
+        self.t3.daemon = True  # make t1 thread daemon thread
+        # <<< Thread Setting
+        self.t3.start()
 
     def msgbox(self, seticon, title, text, btn):
         msg = QMessageBox()

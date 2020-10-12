@@ -12,6 +12,8 @@ COMPLETE = b'\x19'
 ### Flag
 COM_COMPLETE = True
 
+step = 7
+
 mbed = serial.Serial()
 
 def autoSerial():
@@ -38,22 +40,48 @@ def CS(data):
     return (~sum(data)) & 0xFF
 
 
-def Bit_shift(bit_data): # [1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0]
+def bit2byte(bit_data): # [1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0]
     hex_list = []
-    size = len(bit_data)
-    temp = 0
-    for j in range(size):
-        temp |= bit_data[j]
-        if j == size - 1:
-            break
-        if (j+1) % 8 == 0:
+    temp = 0; idx = 7
+    for bit in bit_data:
+        temp |= bit << idx
+        idx -= 1
+        if idx < 0:
             hex_list.append(temp)
-            temp = 0
-        else:
-            temp <<= 1
+            temp = 0; idx = 7
+    if temp:
+        hex_list.append(temp)
     return hex_list # [0x21 0x3F 0xFA 0x27]
 
-
+def dot_debugging(dot_data):
+    # for debugging
+    # print('dot_data', [hex(x) for x in dot_data])
+    # print('dot_data', [bin(x) for x in dot_data])
+    k =1
+    for i in dot_data:
+        for j in range(7,-1,-1):
+            if (j+1) % 2 == 0:
+                print(' ', end=' ')
+            if i & (1 << j):
+                print('●',end=' ')
+            else:
+                print('○', end=' ')
+        if k % step == 0:
+            print()
+        k += 1
+    # for debugging
+    
+def spread(dot):
+    bit = []
+    if dot == ' ':
+        return [0,0,0,0,0,0]
+    s = bin(ord(dot) - 10240)[2:]
+    while len(s) < 6:
+        s = '0' + s
+    for i in range(6):
+        bit.append(int(s[i]))
+    bit.reverse()
+    return bit
 
 def Data_Send(string):
     if not mbed.isOpen():
@@ -62,36 +90,40 @@ def Data_Send(string):
            return 0
     #mbed = serial.Serial(port='COM11', baudrate=115200, timeout=30)
     mbed.flush()
-    kor_to_braille.translate(string)
-    Send_list = kor_to_braille.Dot_bit
+    braille = kor_to_braille.translate(string)
+    doubles = [spread(x) for x in braille]
+    Send_list = [x for double in doubles for x in double]
     Row_Data = [0, 0, 0]
     hex_data = []
 
     for i in range(3):
-        Row_Data[i] = Send_list[i:len(Send_list):3]  # 1,2,3열의 데이터 생성
+        Row_Data[i] = Send_list[i::3]  # 1,2,3열의 데이터 생성
     for i in range(3):
-        hex_data.append(Bit_shift(Row_Data[i])) # [[227, 132, 244, 99, 250, 228, 55, 198, 163, 91, 174, 24], [236, 124, 112, 223, 54, 27, 8, 65, 147, 167, 97, 11], [16, 113, 140, 16, 136, 33, 8, 134, 48, 136, 130, 69]]
+        hex_data.append(bit2byte(Row_Data[i])) # [[227, 132, 244, 99, 250, 228, 55, 198, 163, 91, 174, 24], [236, 124, 112, 223, 54, 27, 8, 65, 147, 167, 97, 11], [16, 113, 140, 16, 136, 33, 8, 134, 48, 136, 130, 69]]
     for line in Row_Data:
-        print(line)
+        i = 1
+        for dot in line:
+            if (i+1) % 2 == 0:
+                print('  ', end='')
+            if dot:
+                print('●',end=' ')
+            else:
+                print('○', end=' ')
+            i += 1
+        print('')
     print(hex_data)
     start = 0
-    end = min(4, len(hex_data[0]))
+    end = min(step, len(hex_data[0]))
     while start < len(hex_data[0]):     #4b,4b,4b 로 끊어서 데이터 만들기
         temp_data = []
         for i in range(3):
             for j in range(start, end):
                 temp_data.append(hex_data[i][j])
-            if end - start < 4:
-                for _i in range(4 - end + start):
-                    temp_data.append(0x00);
-            # while len(temp_data) < 4*(i+1):
-            #     temp_data.append(0x00)
-            if i < 2:
-                temp_data.append(COMMA)
-
+            if end - start < step:
+                for _ in range(step - end + start):
+                    temp_data.append(0x00)
+        dot_debugging(temp_data)
         send_data = [STX, CMD_PRINT, len(temp_data)] + temp_data + [CS(temp_data), ETX] #보낼 데이터
-        print([hex(x) for x in send_data])
-        print([bin(x) for x in send_data])
         mbed.write(bytes(send_data))   #---송신
         print('송신 완료')
 
@@ -108,12 +140,12 @@ def Data_Send(string):
             a = mbed.read()        # 1줄 프린트 완료까지 대기
             if a == COMPLETE:
                 print("한 줄 끝")
-                start += 4
-                end = min(end + 4, len(hex_data[0]))
+                start += step
+                end = min(end + step, len(hex_data[0]))
             else:
                 print('failed', a)
         else:
             print(a)
     print('프린트 완료')
 
-Data_Send('임베디드 소프트웨어 경진대회')
+#Data_Send('서울과학기술대학교')
