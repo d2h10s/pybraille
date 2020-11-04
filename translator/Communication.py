@@ -1,6 +1,8 @@
-import serial
+import serial, sys
 from serial.tools import list_ports
 import translator.kor_to_braille as kor_to_braille
+from PyQt5.QtWidgets import *
+
 ## communication ascii code
 STX = 0x02
 ETX = 0x03
@@ -8,13 +10,41 @@ COMMA = 0x2C
 ACK = b'\x06'
 NAK = b'\x15'
 CMD_PRINT = 0x01
-COMPLETE = b'\x19'
+LINE_COMPLETE = b'\x19'
+
 ### Flag
 COM_COMPLETE = True
+NEXT_PAGE_READY = False
 
 step = 7
+page_line = 30
 
 mbed = serial.Serial()
+
+class confirm(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('Waitting for Next Page')
+        self.center()
+        self.resize(w=300, h=200)
+        self.show()
+        self.btn = QPushButton(self)
+        self.btn.setText('Next Page')
+        self.btn.clicked.connect(self.btnFuntion)
+
+    def center(self):
+        qr = self.frameGeometry() # get position and size of window in rect structure
+        cp = QDesktopWidget().availableGeometry().center() # get center of monitor in point structure
+        qr.moveCenter(cp) # move window to monitor's center
+        self.move(qr.topLeft()) # move window to monitor's center
+
+    def btnFunction(self):
+        global NEXT_PAGE_READY
+        NEXT_PAGE_READY = True
+        qApp.quit()
+
+
+
 
 def autoSerial():
     global mbed
@@ -40,7 +70,7 @@ def CS(data):
     return (~sum(data)) & 0xFF
 
 
-def bit2byte(bit_data): # [1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0]
+def bit2byte(bit_data):
     hex_list = []
     temp = 0; idx = 7
     for bit in bit_data:
@@ -57,29 +87,19 @@ def dot_debugging(dot_data):
     # for debugging
     # print('dot_data', [hex(x) for x in dot_data])
     # print('dot_data', [bin(x) for x in dot_data])
-    k =1
-    for i in dot_data:
+    for k, i in enumerate(dot_data):
         for j in range(7,-1,-1):
-            if (j+1) % 2 == 0:
-                print(' ', end=' ')
-            if i & (1 << j):
-                print('●',end=' ')
-            else:
-                print('○', end=' ')
-        if k % step == 0:
-            print()
-        k += 1
-    # for debugging
-    
+            print(' ', end=' ') if (j+1) % 2 == 0 else 0
+            print('●' if i & (1 << j) else '○',end=' ')
+        print() if (k+1) % step == 0 else 0
+
 def spread(dot):
-    bit = []
     if dot == ' ':
         return [0,0,0,0,0,0]
     s = bin(ord(dot) - 10240)[2:]
     while len(s) < 6:
         s = '0' + s
-    for i in range(6):
-        bit.append(int(s[i]))
+    bit = ([int(s[i]) for i in range(6)])
     bit.reverse()
     return bit
 
@@ -89,29 +109,20 @@ def Data_Send(string):
        if not mbed.isOpen():
            return 0
     #mbed = serial.Serial(port='COM11', baudrate=115200, timeout=30)
-    mbed.flush()
-    braille = kor_to_braille.translate(string)
-    doubles = [spread(x) for x in braille]
+    app = QApplication(sys.argv)
+    doubles = [spread(x) for x in kor_to_braille.translate(string)]
     Send_list = [x for double in doubles for x in double]
-    Row_Data = [0, 0, 0]
-    hex_data = []
-
-    for i in range(3):
-        Row_Data[i] = Send_list[i::3]  # 1,2,3열의 데이터 생성
-    for i in range(3):
-        hex_data.append(bit2byte(Row_Data[i])) # [[227, 132, 244, 99, 250, 228, 55, 198, 163, 91, 174, 24], [236, 124, 112, 223, 54, 27, 8, 65, 147, 167, 97, 11], [16, 113, 140, 16, 136, 33, 8, 134, 48, 136, 130, 69]]
+    Row_Data = [Send_list[i::3] for i in range(3)]  # 1,2,3열의 데이터 생성
+    hex_data = [bit2byte(Row_Data[i]) for i in range(3)] # [[227, 132, 244, 99, 250, 228, 55, 198, 163, 91, 174, 24], [236, 124, 112, 223, 54, 27, 8, 65, 147, 167, 97, 11], [16, 113, 140, 16, 136, 33, 8, 134, 48, 136, 130, 69]]
+    send_data = []
     for line in Row_Data:
-        i = 1
-        for dot in line:
-            if (i+1) % 2 == 0:
-                print('  ', end='')
-            if dot:
-                print('●',end=' ')
-            else:
-                print('○', end=' ')
-            i += 1
+        for i, dot in enumerate(line): # 조심
+            print('  ', end='') if (i+2) % 2 == 0 else 0
+            print('●' if dot else '○',end=' ')
         print('')
     print(hex_data)
+
+    line = 1
     start = 0
     end = min(step, len(hex_data[0]))
     while start < len(hex_data[0]):     #4b,4b,4b 로 끊어서 데이터 만들기
@@ -123,29 +134,31 @@ def Data_Send(string):
                 for _ in range(step - end + start):
                     temp_data.append(0x00)
         dot_debugging(temp_data)
-        send_data = [STX, CMD_PRINT, len(temp_data)] + temp_data + [CS(temp_data), ETX] #보낼 데이터
-        mbed.write(bytes(send_data))   #---송신
-        print('송신 완료')
+        send_data.append([STX, CMD_PRINT, len(temp_data)] + temp_data + [CS(temp_data), ETX]) #보낼 데이터
+        start += step
+        end = min(end + step, len(hex_data[0]))
 
-        print('에코 기다리기')
-        mbed.flush()
-        a = mbed.read()    #--- 답장 ACK or NAK 받기
-        print("보드의 답장 : ",a)
+    while line < len(send_data):
+        mbed.write(bytes(send_data[line]))
+        print(line, 'line transmission OK, waiting echo...')
+        reply = mbed.read()
+        print('reply: ', reply)
 
-        if a == NAK:        # 만약 보드가 못받았으면
-            mbed.write(bytes(send_data))       # 다시 보내기
-            print("재전송")
-        elif a == ACK:             #잘 받았으면
-            print("프린트 완료까지 대기")
-            a = mbed.read()        # 1줄 프린트 완료까지 대기
-            if a == COMPLETE:
-                print("한 줄 끝")
-                start += step
-                end = min(end + step, len(hex_data[0]))
+        if reply == NAK:
+            mbed.write(bytes(send_data[line]))
+            print('recieved NAK, transmit again line', line)
+        elif reply == ACK:
+            print('waitting for complete print a line')
+            reply = mbed.read()
+            if reply == LINE_COMPLETE:
+                print('complete a line')
+                line += 1
             else:
-                print('failed', a)
-        else:
-            print(a)
-    print('프린트 완료')
-
+                print('print failed')
+        else: print('irregular occured, reply:', reply)
+        if line % page_line == 0:
+            print('reload paper, print next page')
+            ex = confirm()
+            while not NEXT_PAGE_READY:
+                pass
 #Data_Send('서울과학기술대학교')

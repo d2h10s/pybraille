@@ -71,8 +71,7 @@ class historyWidget(QWidget):
         print(self.fname)
 
     def play(self):
-        print(self.fname.find('mp3'))
-        if not self.fname:
+        if not 'mp3' in self.fname:
             return
         # >>> Thread Setting
         # if thread is daemon thread, when main thread is terminated immediately daemon thread is killed regardless of end of task
