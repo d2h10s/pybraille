@@ -3,6 +3,10 @@ from serial.tools import list_ports
 import translator.kor_to_braille as kor_to_braille
 from PyQt5.QtWidgets import *
 
+# >>> use if you want to debug without serial
+FOR_DEBUGGING = False
+# <<< use if you want to debug without serial
+
 ## communication ascii code
 STX = 0x02
 ETX = 0x03
@@ -50,7 +54,7 @@ def autoSerial():
     global mbed
     port_lists = list_ports.comports()
     for port in port_lists:
-        print(port[0])
+        print(port)
         try:
             mbed = serial.Serial(port=port[0], baudrate=115200, timeout=1)
             mbed.write(bytes([STX, 0x03, 0x00, 0xFF, ETX]))
@@ -58,13 +62,15 @@ def autoSerial():
             if reply != ACK:
                 mbed = serial.Serial()
                 print(mbed)
-                print('serial not found')
+                print('serial failed')
+                return 0
             elif reply == ACK:
                 print('serail found')
+                return 1
         except:
-            print('2serail not found')
+            print('serail not found')
+            return 0
     mbed.timeout=30
-
 
 def CS(data):
     return (~sum(data)) & 0xFF
@@ -104,23 +110,23 @@ def spread(dot):
     return bit
 
 def Data_Send(string):
-    if not mbed.isOpen():
-       autoSerial()
-       if not mbed.isOpen():
-           return 0
-    #mbed = serial.Serial(port='COM11', baudrate=115200, timeout=30)
+    # if not mbed.isOpen() and not FOR_DEBUGGING:
+    #    autoSerial()
+    #    if not mbed.isOpen():
+    #        return 0
+    mbed = serial.Serial(port='COM6', baudrate=115200, timeout=30)
     app = QApplication(sys.argv)
     doubles = [spread(x) for x in kor_to_braille.translate(string)]
     Send_list = [x for double in doubles for x in double]
     Row_Data = [Send_list[i::3] for i in range(3)]  # 1,2,3열의 데이터 생성
     hex_data = [bit2byte(Row_Data[i]) for i in range(3)] # [[227, 132, 244, 99, 250, 228, 55, 198, 163, 91, 174, 24], [236, 124, 112, 223, 54, 27, 8, 65, 147, 167, 97, 11], [16, 113, 140, 16, 136, 33, 8, 134, 48, 136, 130, 69]]
-    send_data = []
+    send_data = [0]
     for line in Row_Data:
         for i, dot in enumerate(line): # 조심
             print('  ', end='') if (i+2) % 2 == 0 else 0
             print('●' if dot else '○',end=' ')
         print('')
-    print(hex_data)
+    #print(hex_data)
 
     line = 1
     start = 0
@@ -138,7 +144,7 @@ def Data_Send(string):
         start += step
         end = min(end + step, len(hex_data[0]))
 
-    while line < len(send_data):
+    while line < len(send_data) + 1:
         mbed.write(bytes(send_data[line]))
         print(line, 'line transmission OK, waiting echo...')
         reply = mbed.read()
@@ -161,4 +167,4 @@ def Data_Send(string):
             ex = confirm()
             while not NEXT_PAGE_READY:
                 pass
-#Data_Send('서울과학기술대학교')
+Data_Send('서울과학기술대학교')

@@ -1,4 +1,8 @@
-a = [[1,2,3], [3,4,5], [5,6,7]]
+def f(num1):
+    if num1> 5:
+        return True
+    if num1 <= 5:
+        return False
 
-for idx, data in enumerate(a):
-    print(idx, data)
+y = f(1,3)
+print(y)

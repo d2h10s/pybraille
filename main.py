@@ -276,7 +276,7 @@ class mainWindow(QMainWindow):
 
     def text_open(self):
         desktopAddr = os.path.join(os.path.expanduser('~'), 'Desktop')  # get user's destop address regardless of os
-        fname, _ = QFileDialog.getOpenFileName(self, caption='Save File', directory=desktopAddr)
+        fname, _ = QFileDialog.getOpenFileName(self, caption='Save File', dir   ectory=desktopAddr)
         try:
             with open(file=fname, mode='r', encoding='utf-8') as f:
                 text = f.read()
