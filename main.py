@@ -224,6 +224,7 @@ class mainWindow(QMainWindow):
         printAction.triggered.connect(self.print)
         # <<< print Action
 
+        # >>> pause Action
         # >>> menu bar settings
         menubar = self.menuBar()
         menubar.setNativeMenuBar(False) # to present same gui in Mac OS
@@ -276,7 +277,7 @@ class mainWindow(QMainWindow):
 
     def text_open(self):
         desktopAddr = os.path.join(os.path.expanduser('~'), 'Desktop')  # get user's destop address regardless of os
-        fname, _ = QFileDialog.getOpenFileName(self, caption='Save File', dir   ectory=desktopAddr)
+        fname, _ = QFileDialog.getOpenFileName(self, caption='Save File', directory=desktopAddr)
         try:
             with open(file=fname, mode='r', encoding='utf-8') as f:
                 text = f.read()

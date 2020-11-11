@@ -1,7 +1,8 @@
-import serial, sys
+import serial, sys, glob
 from serial.tools import list_ports
 import translator.kor_to_braille as kor_to_braille
 from PyQt5.QtWidgets import *
+from PyQt5.QtCore import QCoreApplication
 
 # >>> use if you want to debug without serial
 FOR_DEBUGGING = False
@@ -21,20 +22,25 @@ COM_COMPLETE = True
 NEXT_PAGE_READY = False
 
 step = 7
-page_line = 30
+page_line = 1
 
 mbed = serial.Serial()
 
-class confirm(QWidget):
+class next_page(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Waitting for Next Page')
         self.center()
-        self.resize(w=300, h=200)
+        self.resize(300, 200)
         self.show()
         self.btn = QPushButton(self)
         self.btn.setText('Next Page')
-        self.btn.clicked.connect(self.btnFuntion)
+        self.btn.resize(self.btn.sizeHint())
+        self.btn.clicked.connect(QCoreApplication.instance().quit)
+
+        self.mlay = QVBoxLayout()
+        self.mlay.addWidget(self.btn)
+        self.setLayout(self.mlay)
 
     def center(self):
         qr = self.frameGeometry() # get position and size of window in rect structure
@@ -42,21 +48,23 @@ class confirm(QWidget):
         qr.moveCenter(cp) # move window to monitor's center
         self.move(qr.topLeft()) # move window to monitor's center
 
-    def btnFunction(self):
-        global NEXT_PAGE_READY
-        NEXT_PAGE_READY = True
-        qApp.quit()
-
-
-
 
 def autoSerial():
     global mbed
-    port_lists = list_ports.comports()
-    for port in port_lists:
+    if sys.platform.startswith('win'):
+        ports = ['COM%s' % i for i in range(1,257)]
+    elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
+        # this excludes your current terminal "/dev/tty"
+        ports = glob.glob('/dev/tty[A-Za-z]*')
+    elif sys.platform.startswith('darwin'):
+        ports = glob.glob('/dev/tty.*')
+    else:
+        raise EnvironmentError('Unsupported platform')
+
+    for port in ports:
         print(port)
         try:
-            mbed = serial.Serial(port=port[0], baudrate=115200, timeout=1)
+            mbed = serial.Serial(port, baudrate=115200, timeout=1)
             mbed.write(bytes([STX, 0x03, 0x00, 0xFF, ETX]))
             reply = mbed.read()
             if reply != ACK:
@@ -67,9 +75,8 @@ def autoSerial():
             elif reply == ACK:
                 print('serail found')
                 return 1
-        except:
+        except (OSError, serial.SerialException):
             print('serail not found')
-            return 0
     mbed.timeout=30
 
 def CS(data):
@@ -80,24 +87,44 @@ def bit2byte(bit_data):
     hex_list = []
     temp = 0; idx = 7
     for bit in bit_data:
+        end_flag = False
         temp |= bit << idx
         idx -= 1
         if idx < 0:
             hex_list.append(temp)
-            temp = 0; idx = 7
-    if temp:
+            temp = 0; idx = 7; end_flag = True
+    if not end_flag:
         hex_list.append(temp)
     return hex_list # [0x21 0x3F 0xFA 0x27]
 
-def dot_debugging(dot_data):
+def debug_temp_data(temp_data):
+    print('------------------------\ntemp data is')
     # for debugging
     # print('dot_data', [hex(x) for x in dot_data])
     # print('dot_data', [bin(x) for x in dot_data])
-    for k, i in enumerate(dot_data):
+    for k, i in enumerate(temp_data):
         for j in range(7,-1,-1):
             print(' ', end=' ') if (j+1) % 2 == 0 else 0
             print('●' if i & (1 << j) else '○',end=' ')
         print() if (k+1) % step == 0 else 0
+
+def debug_hex_data(hex_data):
+    print('------------------------\nhex data is')
+    for line in hex_data:
+        for dot in line:
+            for i in range(7,-1,-1):
+                print('  ', end='') if (i+1) % 2 == 0 else 0
+                print('●' if (dot & 1<<i)>>i else '○', end=' ')
+        print('')
+
+def debug_Row_Data(Row_Data):
+    print('------------------------\nRow Data is')
+    for line in Row_Data:
+        for i, dot in enumerate(line): # 조심
+            print('  ', end='') if (i+2) % 2 == 0 else 0
+            print('●' if dot else '○',end=' ')
+        print('')
+
 
 def spread(dot):
     if dot == ' ':
@@ -110,23 +137,21 @@ def spread(dot):
     return bit
 
 def Data_Send(string):
-    # if not mbed.isOpen() and not FOR_DEBUGGING:
-    #    autoSerial()
-    #    if not mbed.isOpen():
-    #        return 0
-    mbed = serial.Serial(port='COM6', baudrate=115200, timeout=30)
+    if not mbed.isOpen() and not FOR_DEBUGGING:
+       autoSerial()
+       if not mbed.isOpen():
+           return 0
+    # mbed = serial.Serial(port='COM6', baudrate=115200, timeout=30)
     app = QApplication(sys.argv)
     doubles = [spread(x) for x in kor_to_braille.translate(string)]
     Send_list = [x for double in doubles for x in double]
     Row_Data = [Send_list[i::3] for i in range(3)]  # 1,2,3열의 데이터 생성
-    hex_data = [bit2byte(Row_Data[i]) for i in range(3)] # [[227, 132, 244, 99, 250, 228, 55, 198, 163, 91, 174, 24], [236, 124, 112, 223, 54, 27, 8, 65, 147, 167, 97, 11], [16, 113, 140, 16, 136, 33, 8, 134, 48, 136, 130, 69]]
+    hex_data = [bit2byte(Row_Data[i]) for i in range(3)]
     send_data = [0]
-    for line in Row_Data:
-        for i, dot in enumerate(line): # 조심
-            print('  ', end='') if (i+2) % 2 == 0 else 0
-            print('●' if dot else '○',end=' ')
-        print('')
-    #print(hex_data)
+
+    #debug_Row_Data(Row_Data)
+    #debug_hex_data(hex_data)
+    print(hex_data)
 
     line = 1
     start = 0
@@ -139,12 +164,12 @@ def Data_Send(string):
             if end - start < step:
                 for _ in range(step - end + start):
                     temp_data.append(0x00)
-        dot_debugging(temp_data)
+        debug_temp_data(temp_data)
         send_data.append([STX, CMD_PRINT, len(temp_data)] + temp_data + [CS(temp_data), ETX]) #보낼 데이터
         start += step
         end = min(end + step, len(hex_data[0]))
 
-    while line < len(send_data) + 1:
+    while line < len(send_data):
         mbed.write(bytes(send_data[line]))
         print(line, 'line transmission OK, waiting echo...')
         reply = mbed.read()
@@ -162,9 +187,13 @@ def Data_Send(string):
             else:
                 print('print failed')
         else: print('irregular occured, reply:', reply)
-        if line % page_line == 0:
-            print('reload paper, print next page')
-            ex = confirm()
-            while not NEXT_PAGE_READY:
-                pass
-Data_Send('서울과학기술대학교')
+        print(f'line is {line}, page_line is {page_line}, send_data is {len(send_data)}')
+        if line % page_line == 0 and line < len(send_data) - 1:
+            print('reload paper to print next page')
+            modal = next_page()
+            #app.exec_()
+            print('paper loaded')
+            line += 1
+    mbed.close()
+    print('complete print')
+Data_Send('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
