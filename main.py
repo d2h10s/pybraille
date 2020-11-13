@@ -1,4 +1,4 @@
-import sys, os, threading
+import os, threading
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import QDateTime, Qt, QSize, QTimer
@@ -6,6 +6,8 @@ from libpkg import tts
 from playsound import playsound
 from translator.Communication import *
 lock = threading.Lock()
+
+COM_STOP = False
 
 class historyWidget(QWidget):
     def __init__(self):
@@ -224,7 +226,14 @@ class mainWindow(QMainWindow):
         printAction.triggered.connect(self.print)
         # <<< print Action
 
-        # >>> pause Action
+        # >>> print Stop Action
+        # printStopAction = QAction(QIcon('icon/print_stop.png'), '프린트 중단', self)
+        # printStopAction.setShortcut('Ctrl+b')
+        # printStopAction.setStatusTip('현재 작업중인 프린트를 중단합니다.')
+        # printStopAction.triggered.connect(self.printStop)
+        # <<< print Stop Action
+
+
         # >>> menu bar settings
         menubar = self.menuBar()
         menubar.setNativeMenuBar(False) # to present same gui in Mac OS
@@ -255,6 +264,7 @@ class mainWindow(QMainWindow):
         self.toolbar.addAction(fincAction)
         self.toolbar.addWidget(QLabel().setFixedWidth(30)) # Blank label
         self.toolbar.addAction(printAction)
+        # self.toolbar.addAction(printStopAction)
         # <<< tool bar settings
 
         self.centralWidget = centWidget()
@@ -335,6 +345,8 @@ class mainWindow(QMainWindow):
         self.centralWidget.bte.setFont(self.font)  # setFontPointSize(10)
 
     def print(self):
+        global COM_STOP
+        COM_STOP = False
         self.t3 = threading.Thread(target=(Data_Send), args=(self.centralWidget.te.toPlainText().strip(),))
         self.t3.daemon = True  # make t1 thread daemon thread
         # <<< Thread Setting
@@ -353,6 +365,10 @@ class mainWindow(QMainWindow):
         # QMessageBox.Critial : 값은 3 이며, 오류를 나타낼 때 표시
         # QMessageBox.Question : 값은 4 이며, 물음표 아이콘 표시
 
+    def printStop(self):
+        global COM_STOP
+        COM_STOP = True
+        print('comstop', COM_STOP)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
