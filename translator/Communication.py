@@ -1,5 +1,6 @@
 import os, serial, sys, glob, ctypes, threading, time
 import translator.kor_to_braille as kor_to_braille
+from serial.tools import list_ports
 
 # >>> use if you want to debug without serial
 FOR_DEBUGGING = False
@@ -41,17 +42,15 @@ def autoSerial():
             mbed = serial.Serial(port, baudrate=115200, timeout=0.01, write_timeout=0.01)
             mbed.write(bytes([STX, 0x03, 0x00, 0xFF, ETX]))
             reply = mbed.read()
-            print(reply)
             if reply != ACK:
                 mbed = serial.Serial()
             elif reply == ACK:
-                print('serail found')
+                print('serial found')
                 mbed.timeout=30
                 return 1
         except (OSError, serial.SerialException):
             mbed = serial.Serial()
     return 0
-
 
 def CS(data):
     return (~sum(data)) & 0xFF
@@ -150,6 +149,7 @@ def Data_Send(string):
         end = min(end + step, len(hex_data[0]))
 
     while line < len(send_data):
+        print(send_data[line])
         mbed.write(bytes(send_data[line]))
         print(line, 'line transmission OK, waiting echo...')
         reply = mbed.read()
@@ -178,5 +178,3 @@ def Data_Send(string):
             print('paper loaded')
     mbed.close()
     print('complete print')
-    
-Data_Send('asdfasdf')
