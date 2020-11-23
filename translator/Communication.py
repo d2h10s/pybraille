@@ -173,7 +173,6 @@ def Data_Send(string):
         print(f'line is {line}, page_line is {page_line}, send_data is {len(send_data)}')
         if line % page_line == 0 and line < len(send_data):
             print('reload paper to print next page')
-            mbed.write(bytes([]))
             ctypes.windll.user32.MessageBoxW(None, '종이를 교체해주세요', '대기중', 0)
             print('paper loaded')
     mbed.close()
