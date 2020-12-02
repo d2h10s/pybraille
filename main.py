@@ -3,12 +3,15 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import QDateTime, Qt, QSize, QTimer
 from playsound import playsound
+
+from translator.kor_to_braille import translate
 from translator.tts import text2speech
 from translator.Communication import Data_Send
 
 lock = threading.Lock()
 
-COM_STOP = False
+baud = 9600
+txtEncoding = 'UTF-8'
 
 class historyWidget(QWidget):
     def __init__(self):
@@ -22,47 +25,17 @@ class historyWidget(QWidget):
             if os.path.isfile(self.fname + str(fidx) + '.mp3'):
                 self.isfile[fidx] = True
                 self.cb.addItem('TTS' + str(fidx) + '.mp3')
-        #self.cb.move(183,10)
         self.cb.activated[str].connect(self.onActivated)
         self.lbl_front = QLabel('현재 저장되어 있는 tts 기록: ', self)
-        #self.lbl_front.move(10,14)
 
         self.lbl_caution = QLabel('※1번이 가장 최근의 TTS 파일입니다.', self)
-        #self.lbl_caution.move(10, 465)
-
-        # >>> slider Setting
-        # self.lbl_start = QLabel('0:00', self)
-        # self.lbl_end = QLabel('0:00', self)
-        # self.lbl_start.move((self.width()-400)/2 - 30, 350)
-        # self.lbl_end.move(self.width() - (self.width() - 400) / 2 + 20, 350)
-        # self.sld = QSlider(Qt.Horizontal, self)
-        # self.sld.setFixedWidth(400)
-        # self.sld.move((self.width()-400)/2, 350)
-        # self.sld.setSingleStep(1)
-        # <<< Slider Setting
-
-        # >>> Play Button Setting
-        # self.btn_pause = QPushButton('', self)
-        # self.btn_pause.setIcon(QIcon('icon/pause.png'))
-        # self.btn_pause.setIconSize(QSize(40, 40))
-        # self.btn_pause.setStyleSheet('QPushButton{border: 0px solid;}')
-        # self.btn_pause.clicked.connect(self.pause)
-        # self.btn_pause.move(170, 400)
 
         self.btn_play = QPushButton('', self)
         self.btn_play.setIcon(QIcon('icon/play.png'))
         self.btn_play.setIconSize(QSize(40, 40))
         self.btn_play.setStyleSheet('QPushButton{border: 0px solid;}')
         self.btn_play.clicked.connect(self.play)
-        #self.btn_play.move(200, 50)
 
-        # self.btn_stop = QPushButton('', self)
-        # self.btn_stop.setIcon(QIcon('icon/stop.png'))
-        # self.btn_stop.setIconSize(QSize(40, 40))
-        # self.btn_stop.setStyleSheet('QPushButton{border: 0px solid;}')
-        # self.btn_stop.clicked.connect(self.stop)
-        # self.btn_stop.move(510, 400)
-        # <<< Play Button Setting
         self.vlay = QVBoxLayout()
         self.hlay = QHBoxLayout()
         self.hlay.addWidget(self.lbl_front)
@@ -138,7 +111,7 @@ class centWidget(QWidget):
 
     def text_changed(self):
         try:
-            self.bte.setText(kor_to_braille.translate(self.te.toPlainText()))
+            self.bte.setText(translate(self.te.toPlainText()))
         except:
             pass
         self.lbl_teCnt.setText(str(len(self.te.toPlainText())) + ' 자')
@@ -237,13 +210,17 @@ class mainWindow(QMainWindow):
         printAction.triggered.connect(self.print)
         # <<< print Action
 
-        # >>> print Stop Action
-        # printStopAction = QAction(QIcon('icon/print_stop.png'), '프린트 중단', self)
-        # printStopAction.setShortcut('Ctrl+b')
-        # printStopAction.setStatusTip('현재 작업중인 프린트를 중단합니다.')
-        # printStopAction.triggered.connect(self.printStop)
-        # <<< print Stop Action
+        # >>> BAUD COMB
+        # self.bcb = QComboBox(self)
+        # self.bcb.addItems(['9600', '19200', '38400', '115200'])
+        # self.bcb.activated[str].connect(self.setBaudrate)
+        # <<< BAUD COMB Action
 
+        # >>> ENCODING COMB
+        # self.ecb = QComboBox(self)
+        # self.ecb.addItems(['UTF-8', 'ANSI'])
+        # self.ecb.activated[str].connect(self.setEncoding)
+        # <<< ENCODING COMB Action
 
         # >>> menu bar settings
         menubar = self.menuBar()
@@ -261,6 +238,7 @@ class mainWindow(QMainWindow):
         voicemenu = menubar.addMenu('&Voice')
         voicemenu.addAction(ttsAction)
         voicemenu.addAction(ttshisAction)
+
         # <<< menu bar settings
 
         # >>> tool bar settings
@@ -269,12 +247,14 @@ class mainWindow(QMainWindow):
         self.toolbar.addAction(saveAction)
         self.toolbar.addAction(ttsAction)
         self.toolbar.addAction(ttshisAction)
-        self.toolbar.addWidget(QLabel().setFixedWidth(30)) # Blank label
+        self.toolbar.addWidget(QLabel('      ')) # Blank label
         self.toolbar.addAction(fdecAction)
         self.toolbar.addWidget(self.lbl_fsize)
         self.toolbar.addAction(fincAction)
-        self.toolbar.addWidget(QLabel().setFixedWidth(30)) # Blank label
+        self.toolbar.addWidget(QLabel('      ')) # Blank label
         self.toolbar.addAction(printAction)
+        # self.toolbar.addWidget(self.bcb)
+        # self.toolbar.addWidget(self.ecb)
         # self.toolbar.addAction(printStopAction)
         # <<< tool bar settings
 
@@ -300,7 +280,7 @@ class mainWindow(QMainWindow):
         desktopAddr = os.path.join(os.path.expanduser('~'), 'Desktop')  # get user's destop address regardless of os
         fname, _ = QFileDialog.getOpenFileName(self, caption='Save File', directory=desktopAddr)
         try:
-            with open(file=fname, mode='r', encoding='utf-8') as f:
+            with open(file=fname, mode='r', encoding='UTF-8') as f:
                 text = f.read()
                 self.centralWidget.te.setText(text)
             self.msgbox(QMessageBox.Information, '확인', '열기를 성공하였습니다.', QMessageBox.Ok)
@@ -312,12 +292,10 @@ class mainWindow(QMainWindow):
     def text_save(self, event):
         desktopAddr = os.path.join(os.path.expanduser('~'),'Desktop') # get user's destop address regardless of os
         fname, _ = QFileDialog.getSaveFileName(self, caption='Save File', directory=desktopAddr)
-        try:
-            with open(file=fname, mode='w') as f:
-                f.write(self.centralWidget.te.toPlainText())
-            self.msgbox(QMessageBox.Information, '확인', '저장하였습니다.', QMessageBox.Ok)
-        except:
-            self.msgbox(QMessageBox.Information, '오류', '저장을 실패하였습니다.', QMessageBox.Ok)
+        if not fname.endswith('.txt'):
+            fname += '.txt'
+        with open(file=fname, mode='w', encoding='UTF-8') as f:
+            f.write(self.centralWidget.te.toPlainText())
 
     def tts_btn(self):
         # >>> Thread Setting
@@ -356,12 +334,20 @@ class mainWindow(QMainWindow):
         self.centralWidget.bte.setFont(self.font)  # setFontPointSize(10)
 
     def print(self):
-        global COM_STOP
-        COM_STOP = False
         self.t3 = threading.Thread(target=(Data_Send), args=(self.centralWidget.te.toPlainText().strip(),))
         self.t3.daemon = True  # make t1 thread daemon thread
         # <<< Thread Setting
         self.t3.start()
+
+    # def setBaudrate(self, text):
+    #     global baud
+    #     baud = int(text)
+    #     print('baudrate set', )
+    #
+    # def setEncoding(self, text):
+    #     global txtEncoding
+    #     txtEncoding = text
+    #     print('encoding set', )
 
     def msgbox(self, seticon, title, text, btn):
         msg = QMessageBox()
@@ -376,12 +362,12 @@ class mainWindow(QMainWindow):
         # QMessageBox.Critial : 값은 3 이며, 오류를 나타낼 때 표시
         # QMessageBox.Question : 값은 4 이며, 물음표 아이콘 표시
 
-    def printStop(self):
-        global COM_STOP
-        COM_STOP = True
-        print('comstop', COM_STOP)
-
 if __name__ == '__main__':
+    try:
+        os.chdir(sys._MEIPASS)
+        print(sys._MEIPASS)
+    except:
+        os.chdir(os.getcwd())
     app = QApplication(sys.argv)
     ex = mainWindow()
     sys.exit(app.exec_())
