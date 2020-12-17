@@ -1,24 +1,198 @@
 import sys, os, threading
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon, QFont
-from PyQt5.QtCore import QDateTime, Qt, QSize, QTimer
+from PyQt5.QtGui import QIcon, QFont, QImage, QPixmap
+from PyQt5.QtCore import QDateTime, Qt, QSize, QTimer, QThread
 from playsound import playsound
+import cv2, pytesseract
+import numpy as np
 
-from translator.kor_to_braille import translate
-from translator.tts import text2speech
-from translator.Communication import Data_Send
+from lib.kor_to_braille import translate
+from lib.tts import text2speech
+from lib.Communication import Data_Send
+from lib.preprocess_img import process
 
 lock = threading.Lock()
 
 baud = 9600
 txtEncoding = 'UTF-8'
 
+
+class ocrWidget(QWidget):
+    def __init__(self, main):
+        super(ocrWidget, self).__init__()
+        self.main = main
+
+        self.setWindowTitle('ocr')
+
+        # >>> Flag Setting
+        self.isCamRun = False
+        self.lbl_pic = QLabel('', self)
+        self.img = np.array([])
+        self.camEnd = True
+        # >>> camAction
+        self.camAction = QAction(QIcon('icon/cam.png'), '카메라 켜기/끄기', self)
+        self.camAction.triggered.connect(self.cam)
+
+        # >>> text open Action
+        self.openAction = QAction(QIcon('icon/open.png'), '불러오기', self)
+        self.openAction.triggered.connect(self.img_open)
+
+        # >>> ocr Action
+        self.ocrAction = QAction(QIcon('icon/ocr.png'), 'OCR 실행', self)
+        self.ocrAction.triggered.connect(self.ocrRun)
+
+        # >>> ccw Action
+        self.ccwAction = QAction(QIcon('icon/ccw.png'), '반시계 방향 회전', self)
+        self.ccwAction.triggered.connect(self.ccwRotate)
+
+        # >>> cw Action
+        self.cwAction = QAction(QIcon('icon/cw.png'), '반시계 방향 회전', self)
+        self.cwAction.triggered.connect(self.cwRotate)
+
+        # >>> Layout Settings
+        self.toolbar = QToolBar()
+        self.toolbar.addAction(self.camAction)
+        self.toolbar.addAction(self.openAction)
+        self.toolbar.addWidget(QLabel('      '))  # Blank label
+        self.toolbar.addAction(self.ccwAction)
+        self.toolbar.addAction(self.cwAction)
+        self.toolbar.addWidget(QLabel('      '))  # Blank label
+        self.toolbar.addAction(self.ocrAction)
+
+        self.vlay = QVBoxLayout()
+        self.vlay.addWidget(self.toolbar)
+        self.vlay.addWidget(self.lbl_pic)
+
+        self.setLayout(self.vlay)
+
+        # environment variable settings
+        if not 'Tesseract' in os.environ.get('path'):
+            os.environ['path'].append(r'C:\Program Files\Tesseract-OCR\tesseract')
+            print('tesseract environment variable appended')
+
+        if not os.environ.get('TESSDATA_PREFIX'):
+            os.environ['TESSDATA_PREFIX'] = r'C:\Program Files\Tesseract-OCR\tesseract\tessdata'
+            print('tessdata environment variable appended')
+        pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract'
+
+        # >>> Window Setting
+        width, height = 640, 480
+        self.resize(width, height+34) # set window size
+        main.center()
+        self.show()
+        self.cap = cv2.VideoCapture(0)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+        self.cap.release()
+
+    def __del__(self):
+        if self.cap.isOpened():
+           self.cap.release()
+           del self.cap
+    def img_open(self):
+        self.isCamRun = False
+        desktopAddr = os.path.join(os.path.expanduser('~'), 'Desktop')  # get user's destop address regardless of os
+        fname, _ = QFileDialog.getOpenFileName(self, caption='Save File', directory=desktopAddr)
+        try:
+            if not fname:
+                return
+            self.img = cv2.imread(fname)
+            mainWindow.msgbox(self, QMessageBox.Information, '확인', '열기를 성공하였습니다.', QMessageBox.Ok)
+            img = cv2.cvtColor(self.img, cv2.COLOR_BGR2RGB)
+            img = cv2.resize(img, (640, 640 * self.img.shape[0] // self.img.shape[1]))
+            h, w, c = img.shape
+            qImg = QImage(img.data, w, h, w * c, QImage.Format_RGB888)
+            pixmap = QPixmap.fromImage(qImg)
+            self.lbl_pic.setPixmap(pixmap)
+        except:
+            mainWindow.msgbox(self,QMessageBox.Information, '오류', '열기를 실패하였습니다.', QMessageBox.Ok)
+
+    def cam(self):
+        if self.isCamRun or not self.camEnd:
+            self.isCamRun = False
+            self.camAction.setIcon(QIcon('icon/cam.png'))
+            return False
+        self.t1 = threading.Thread(target=self.camRun)
+        self.t1.daemon = True
+        self.t1.start()
+        return True
+
+    def camRun(self):
+        lock.acquire()
+        self.isCamRun = True
+        self.camEnd = False
+        self.camAction.setIcon(QIcon('icon/cam_green.png'))
+        try:
+            self.cap.open(0)
+            width, height = 640, 480
+            self.resize(width, height + 34)  # set window size
+            self.lbl_pic.resize(width, height)
+            while self.isCamRun:
+                ret, self.img = self.cap.read()
+                if not ret:
+                    mainWindow.msgbox(self, seticon=QMessageBox.Critical, title='오류', text='카메라를 작동할 수 없습니다.', btn=QMessageBox.Ok)
+                    print('can\'t open camera')
+                    self.isCamRun = False
+                    break
+
+                img = cv2.resize(self.img, (640, 640 * self.img.shape[0] // self.img.shape[1]))
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                h, w, c = img.shape
+                qImg = QImage(img.data, w, h, w * c, QImage.Format_RGB888)
+                pixmap = QPixmap.fromImage(qImg)
+                self.lbl_pic.setPixmap(pixmap)
+        except:
+            mainWindow.msgbox(self, QMessageBox.Information, '오류', '카메라 오류가 발생하였습니다.', QMessageBox.Ok)
+            print('cam error occured')
+        self.cap.release()
+        self.camAction.setIcon(QIcon('icon/cam.png'))
+        print('cam end')
+        self.camEnd = True
+        lock.release()
+
+    def ocrRun(self):
+        if self.img.size == 0:
+            mainWindow.msgbox(self, QMessageBox.Information, '오류', '이미지를 먼저 지정해주세요.', QMessageBox.Ok)
+            return
+        if self.isCamRun:
+            self.isCamRun = False
+        self.camAction.setIcon(QIcon('icon/cam.png'))
+        self.img = process(self.img)
+        text = pytesseract.image_to_string(self.img, lang='kor', config='--psm 1 -c preserve_interword_spaces=1')
+        self.main.centralWidget.te.setText(text)
+
+    def ccwRotate(self):
+        if self.img.size == 0:
+            mainWindow.msgbox(self, QMessageBox.Information, '오류', '이미지를 먼저 지정해주세요.', QMessageBox.Ok)
+            return
+        h,w, *_ = self.img.shape
+        self.img = cv2.rotate(self.img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        img = cv2.resize(self.img, (640, 640 * self.img.shape[0] // self.img.shape[1]))
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        h, w, c = img.shape
+        qImg = QImage(img.data, w, h, w * c, QImage.Format_RGB888)
+        pixmap = QPixmap.fromImage(qImg)
+        self.lbl_pic.setPixmap(pixmap)
+
+    def cwRotate(self):
+        if self.img.size == 0:
+            mainWindow.msgbox(self, QMessageBox.Information, '오류', '이미지를 먼저 지정해주세요.', QMessageBox.Ok)
+            return
+        h,w, *_ = self.img.shape
+        self.img = cv2.rotate(self.img, cv2.ROTATE_90_CLOCKWISE)
+        img = cv2.resize(self.img, (640, 640 * self.img.shape[0] // self.img.shape[1]))
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        h, w, c = img.shape
+        qImg = QImage(img.data, w, h, w * c, QImage.Format_RGB888)
+        pixmap = QPixmap.fromImage(qImg)
+        self.lbl_pic.setPixmap(pixmap)
+
 class historyWidget(QWidget):
     def __init__(self):
-        super().__init__()
+        super(historyWidget, self).__init__()
 
         self.setWindowTitle('TTS Player')
-        self.fname = 'data/TTS'
+        self.fname = 'data_tts/TTS'
         self.isfile = [False] * 11
         self.cb = QComboBox(self)
         for fidx in range(1, 11):
@@ -73,10 +247,9 @@ class historyWidget(QWidget):
     def play_music(self):
         print('thread start')
         lock.acquire()
-        playsound('data/' + self.fname)
+        playsound('data_tts/' + self.fname)
         lock.release()
         print('thread exit')
-
 
 class centWidget(QWidget):
     def __init__(self):
@@ -108,7 +281,8 @@ class centWidget(QWidget):
         self.mainHBox.addLayout(self.textHBox)
         self.setLayout(self.mainHBox)
         # <<< text editor settings
-
+    def __call__(self):
+        return self
     def text_changed(self):
         try:
             self.bte.setText(translate(self.te.toPlainText()))
@@ -124,6 +298,8 @@ class mainWindow(QMainWindow):
 
         self.setWindowTitle('Dot  ::  designed by d2h10s') # set window title
         self.setWindowIcon(QIcon('icon/printer.png')) # set window icon
+
+        self.isOnOcrWidget = False
 
         # >>> status bar setting
         self.statMsg = 'Ready'
@@ -142,9 +318,7 @@ class mainWindow(QMainWindow):
         self.lbl_fsize.setFont(QFont("consolas", 14, QFont.Bold))
         self.lbl_fsize.setFixedWidth(50)
         self.lbl_fsize.setAlignment(Qt.AlignCenter)
-        self.lbl_fsize.setStyleSheet("background-color: #FFFFFF;"
-                                     "border-style: solid;"
-                                     "order-color: #FFFFFF;"
+        self.lbl_fsize.setStyleSheet("border-style: solid;"
                                      "border-width: 2px;"
                                      "border-radius: 3px;")
         # <<< font size label settings
@@ -210,6 +384,14 @@ class mainWindow(QMainWindow):
         printAction.triggered.connect(self.print)
         # <<< print Action
 
+        # >>> OCR Action
+        ocrAction = QAction(QIcon('icon/ocr.png'), '문서 인식', self)
+        ocrAction.setShortcut('Ctrl+r')
+        ocrAction.setStatusTip('문서 이미지를 텍스트로 변환합니다.')
+        ocrAction.triggered.connect(self.ocrw)
+        # <<< OCR Action
+
+
         # >>> BAUD COMB
         # self.bcb = QComboBox(self)
         # self.bcb.addItems(['9600', '19200', '38400', '115200'])
@@ -234,6 +416,7 @@ class mainWindow(QMainWindow):
         editormenu = menubar.addMenu('&Editor') # editor menu
         editormenu.addAction(fincAction) # font size increase
         editormenu.addAction(fdecAction) # font size decrease
+        editormenu.addAction(ocrAction)
 
         voicemenu = menubar.addMenu('&Voice')
         voicemenu.addAction(ttsAction)
@@ -253,6 +436,7 @@ class mainWindow(QMainWindow):
         self.toolbar.addAction(fincAction)
         self.toolbar.addWidget(QLabel('      ')) # Blank label
         self.toolbar.addAction(printAction)
+        self.toolbar.addAction(ocrAction)
         # self.toolbar.addWidget(self.bcb)
         # self.toolbar.addWidget(self.ecb)
         # self.toolbar.addAction(printStopAction)
@@ -361,6 +545,11 @@ class mainWindow(QMainWindow):
         # QMessageBox.Warning : 값은 2 이며, 느낌표 아이콘에 배경이 노란색 삼각형 표시
         # QMessageBox.Critial : 값은 3 이며, 오류를 나타낼 때 표시
         # QMessageBox.Question : 값은 4 이며, 물음표 아이콘 표시
+
+    def ocrw(self):
+        self.ocr = ocrWidget(self)
+        self.isOnOcrWidget = not self.isOnOcrWidget
+
 
 if __name__ == '__main__':
     try:
