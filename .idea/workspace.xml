@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="ed8057c4-a2aa-4d6c-b927-d3e3d06f322e" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/EAST.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data_tts/TTS10.mp3" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data_tts/TTS2.mp3" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data_tts/TTS3.mp3" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data_tts/TTS4.mp3" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data_tts/TTS5.mp3" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data_tts/TTS6.mp3" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data_tts/TTS8.mp3" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data_tts/TTS9.mp3" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/lib/preprocess_img.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/s1.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/Analysis-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/Analysis-00.toc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/EXE-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/EXE-00.toc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/PKG-00.pkg" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/PKG-00.pkg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/PKG-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/PKG-00.toc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/PYZ-00.pyz" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/PYZ-00.pyz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/PYZ-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/PYZ-00.toc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/warn-main.txt" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/warn-main.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/xref-main.html" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/xref-main.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/TTS1.mp3" beforeDir="false" afterPath="$PROJECT_DIR$/data_tts/TTS1.mp3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/tts10.mp3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/tts2.mp3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/tts3.mp3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/tts4.mp3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/tts5.mp3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/tts6.mp3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/tts7.mp3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/tts8.mp3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/tts9.mp3" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/Dot_SNUST.exe" beforeDir="false" afterPath="$PROJECT_DIR$/dist/Dot_SNUST.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/icon/printer.png" beforeDir="false" afterPath="$PROJECT_DIR$/icon/printer.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/translator/Communication.py" beforeDir="false" afterPath="$PROJECT_DIR$/lib/Communication.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/translator/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/data_tts/TTS7.mp3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/translator/kor_to_braille.py" beforeDir="false" afterPath="$PROJECT_DIR$/lib/kor_to_braille.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/translator/map_kor_to_braille.py" beforeDir="false" afterPath="$PROJECT_DIR$/lib/map_kor_to_braille.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/translator/tts.py" beforeDir="false" afterPath="$PROJECT_DIR$/lib/tts.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1kK16n2sjJWYn11aoFauXic3S0T" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\d2_h10s\OneDrive - 서울과학기술대학교\GitHub\pybraille" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\d2_h10s\OneDrive - 서울과학기술대학교\GitHub\pybraille\translator" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.main">
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="pybraille" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\d2_h10s\anaconda3\envs\braille\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="preprocess_img" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="pybraille" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/lib" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/lib/preprocess_img.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="pybraille" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="test2" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="pybraille" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test2.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="text_cropping" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="pybraille" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/lib" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/lib/text_cropping.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.main" />
+        <item itemvalue="Python.test2" />
+        <item itemvalue="Python.preprocess_img" />
+        <item itemvalue="Python.test" />
+        <item itemvalue="Python.text_cropping" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ed8057c4-a2aa-4d6c-b927-d3e3d06f322e" name="Default Changelist" comment="" />
+      <created>1605434295973</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1605434295973</updated>
+      <workItem from="1605434301411" duration="24000" />
+      <workItem from="1605434327102" duration="1384000" />
+      <workItem from="1605435848215" duration="324000" />
+      <workItem from="1605676380482" duration="3474000" />
+      <workItem from="1605679883946" duration="139000" />
+      <workItem from="1605759239977" duration="12882000" />
+      <workItem from="1605795451801" duration="623000" />
+      <workItem from="1605859446027" duration="2605000" />
+      <workItem from="1606030319613" duration="4078000" />
+      <workItem from="1606050121038" duration="75000" />
+      <workItem from="1606247611759" duration="5296000" />
+      <workItem from="1606290059912" duration="42000" />
+      <workItem from="1606291256390" duration="50000" />
+      <workItem from="1606476125293" duration="616000" />
+      <workItem from="1606573896635" duration="432000" />
+      <workItem from="1606629664056" duration="1969000" />
+      <workItem from="1606633178078" duration="827000" />
+      <workItem from="1606640652719" duration="600000" />
+      <workItem from="1606657440541" duration="1122000" />
+      <workItem from="1606899412724" duration="49000" />
+      <workItem from="1606913361713" duration="9000" />
+      <workItem from="1607167542875" duration="183000" />
+      <workItem from="1607993927379" duration="10399000" />
+      <workItem from="1608043772070" duration="702000" />
+      <workItem from="1608095520556" duration="1451000" />
+      <workItem from="1608098558481" duration="4078000" />
+      <workItem from="1608104257755" duration="144000" />
+      <workItem from="1608107007754" duration="26376000" />
+      <workItem from="1608184361826" duration="8767000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="460" y="194" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1605434349174">
+      <screen x="93" y="0" width="1827" height="1080" />
+    </state>
+    <state x="460" y="194" key="#com.intellij.execution.impl.EditConfigurationsDialog/93.0.1827.1080/1920.37.1680.1010@93.0.1827.1080" timestamp="1605434349174" />
+    <state x="712" y="131" key="#main" timestamp="1605434339503">
+      <screen x="93" y="0" width="1827" height="1080" />
+    </state>
+    <state x="712" y="131" key="#main/93.0.1827.1080/1920.37.1680.1010@93.0.1827.1080" timestamp="1605434339503" />
+    <state x="767" y="294" key="FileChooserDialogImpl" timestamp="1608097755848">
+      <screen x="62" y="0" width="1858" height="1080" />
+    </state>
+    <state x="767" y="294" key="FileChooserDialogImpl/62.0.1858.1080/1920.37.1680.1010@62.0.1858.1080" timestamp="1606913368983" />
+    <state x="767" y="294" key="FileChooserDialogImpl/62.0.1858.1080@62.0.1858.1080" timestamp="1608097755848" />
+    <state x="695" y="286" key="FileChooserDialogImpl/93.0.1587.1050@93.0.1587.1050" timestamp="1606035639209" />
+    <state x="786" y="294" key="FileChooserDialogImpl/93.0.1827.1080/1920.0.1920.1040@93.0.1827.1080" timestamp="1605869034871" />
+    <state x="786" y="294" key="FileChooserDialogImpl/93.0.1827.1080/1920.37.1680.1010@93.0.1827.1080" timestamp="1605680013809" />
+    <state x="786" y="294" key="FileChooserDialogImpl/93.0.1827.1080@93.0.1827.1080" timestamp="1605676529445" />
+    <state width="1815" height="363" key="GridCell.Tab.0.bottom" timestamp="1608247758341">
+      <screen x="62" y="0" width="1858" height="1080" />
+    </state>
+    <state width="1815" height="363" key="GridCell.Tab.0.bottom/1982.0.1858.1080/62.0.1858.1080@62.0.1858.1080" timestamp="1608109535922" />
+    <state width="1815" height="363" key="GridCell.Tab.0.bottom/62.0.1858.1080/1920.37.1680.1010@62.0.1858.1080" timestamp="1608136075751" />
+    <state width="1815" height="363" key="GridCell.Tab.0.bottom/62.0.1858.1080@62.0.1858.1080" timestamp="1608247758341" />
+    <state width="1544" height="256" key="GridCell.Tab.0.bottom/93.0.1587.1050@93.0.1587.1050" timestamp="1606034846081" />
+    <state width="1784" height="265" key="GridCell.Tab.0.bottom/93.0.1827.1080/1920.0.1920.1040@93.0.1827.1080" timestamp="1605869036446" />
+    <state width="1784" height="265" key="GridCell.Tab.0.bottom/93.0.1827.1080/1920.37.1680.1010@93.0.1827.1080" timestamp="1605860801849" />
+    <state width="1784" height="264" key="GridCell.Tab.0.bottom/93.0.1827.1080@93.0.1827.1080" timestamp="1606289293402" />
+    <state width="2423" height="373" key="GridCell.Tab.0.bottom/93.0.2467.1440/979.2160.1920.1040@93.0.2467.1440" timestamp="1605775998735" />
+    <state width="1815" height="363" key="GridCell.Tab.0.center" timestamp="1608247758340">
+      <screen x="62" y="0" width="1858" height="1080" />
+    </state>
+    <state width="1815" height="363" key="GridCell.Tab.0.center/1982.0.1858.1080/62.0.1858.1080@62.0.1858.1080" timestamp="1608109535922" />
+    <state width="1815" height="363" key="GridCell.Tab.0.center/62.0.1858.1080/1920.37.1680.1010@62.0.1858.1080" timestamp="1608136075751" />
+    <state width="1815" height="363" key="GridCell.Tab.0.center/62.0.1858.1080@62.0.1858.1080" timestamp="1608247758340" />
+    <state width="1544" height="256" key="GridCell.Tab.0.center/93.0.1587.1050@93.0.1587.1050" timestamp="1606034846080" />
+    <state width="1784" height="265" key="GridCell.Tab.0.center/93.0.1827.1080/1920.0.1920.1040@93.0.1827.1080" timestamp="1605869036446" />
+    <state width="1784" height="265" key="GridCell.Tab.0.center/93.0.1827.1080/1920.37.1680.1010@93.0.1827.1080" timestamp="1605860801849" />
+    <state width="1784" height="264" key="GridCell.Tab.0.center/93.0.1827.1080@93.0.1827.1080" timestamp="1606289293402" />
+    <state width="2423" height="373" key="GridCell.Tab.0.center/93.0.2467.1440/979.2160.1920.1040@93.0.2467.1440" timestamp="1605775998735" />
+    <state width="1815" height="363" key="GridCell.Tab.0.left" timestamp="1608247758340">
+      <screen x="62" y="0" width="1858" height="1080" />
+    </state>
+    <state width="1815" height="363" key="GridCell.Tab.0.left/1982.0.1858.1080/62.0.1858.1080@62.0.1858.1080" timestamp="1608109535922" />
+    <state width="1815" height="363" key="GridCell.Tab.0.left/62.0.1858.1080/1920.37.1680.1010@62.0.1858.1080" timestamp="1608136075751" />
+    <state width="1815" height="363" key="GridCell.Tab.0.left/62.0.1858.1080@62.0.1858.1080" timestamp="1608247758340" />
+    <state width="1544" height="256" key="GridCell.Tab.0.left/93.0.1587.1050@93.0.1587.1050" timestamp="1606034846080" />
+    <state width="1784" height="265" key="GridCell.Tab.0.left/93.0.1827.1080/1920.0.1920.1040@93.0.1827.1080" timestamp="1605869036445" />
+    <state width="1784" height="265" key="GridCell.Tab.0.left/93.0.1827.1080/1920.37.1680.1010@93.0.1827.1080" timestamp="1605860801848" />
+    <state width="1784" height="264" key="GridCell.Tab.0.left/93.0.1827.1080@93.0.1827.1080" timestamp="1606289293402" />
+    <state width="2423" height="373" key="GridCell.Tab.0.left/93.0.2467.1440/979.2160.1920.1040@93.0.2467.1440" timestamp="1605775998735" />
+    <state width="1815" height="363" key="GridCell.Tab.0.right" timestamp="1608247758340">
+      <screen x="62" y="0" width="1858" height="1080" />
+    </state>
+    <state width="1815" height="363" key="GridCell.Tab.0.right/1982.0.1858.1080/62.0.1858.1080@62.0.1858.1080" timestamp="1608109535922" />
+    <state width="1815" height="363" key="GridCell.Tab.0.right/62.0.1858.1080/1920.37.1680.1010@62.0.1858.1080" timestamp="1608136075751" />
+    <state width="1815" height="363" key="GridCell.Tab.0.right/62.0.1858.1080@62.0.1858.1080" timestamp="1608247758340" />
+    <state width="1544" height="256" key="GridCell.Tab.0.right/93.0.1587.1050@93.0.1587.1050" timestamp="1606034846081" />
+    <state width="1784" height="265" key="GridCell.Tab.0.right/93.0.1827.1080/1920.0.1920.1040@93.0.1827.1080" timestamp="1605869036446" />
+    <state width="1784" height="265" key="GridCell.Tab.0.right/93.0.1827.1080/1920.37.1680.1010@93.0.1827.1080" timestamp="1605860801849" />
+    <state width="1784" height="264" key="GridCell.Tab.0.right/93.0.1827.1080@93.0.1827.1080" timestamp="1606289293402" />
+    <state width="2423" height="373" key="GridCell.Tab.0.right/93.0.2467.1440/979.2160.1920.1040@93.0.2467.1440" timestamp="1605775998735" />
+    <state width="1815" height="363" key="GridCell.Tab.1.bottom" timestamp="1608247758341">
+      <screen x="62" y="0" width="1858" height="1080" />
+    </state>
+    <state width="1815" height="363" key="GridCell.Tab.1.bottom/1982.0.1858.1080/62.0.1858.1080@62.0.1858.1080" timestamp="1608109535772" />
+    <state width="1815" height="363" key="GridCell.Tab.1.bottom/62.0.1858.1080/1920.37.1680.1010@62.0.1858.1080" timestamp="1608136075752" />
+    <state width="1815" height="363" key="GridCell.Tab.1.bottom/62.0.1858.1080@62.0.1858.1080" timestamp="1608247758341" />
+    <state width="1784" height="364" key="GridCell.Tab.1.bottom/93.0.1827.1080/1920.37.1680.1010@93.0.1827.1080" timestamp="1605436172181" />
+    <state width="2423" height="508" key="GridCell.Tab.1.bottom/93.0.2467.1440/979.2160.1920.1040@93.0.2467.1440" timestamp="1605775998730" />
+    <state width="1815" height="363" key="GridCell.Tab.1.center" timestamp="1608247758341">
+      <screen x="62" y="0" width="1858" height="1080" />
+    </state>
+    <state width="1815" height="363" key="GridCell.Tab.1.center/1982.0.1858.1080/62.0.1858.1080@62.0.1858.1080" timestamp="1608109535772" />
+    <state width="1815" height="363" key="GridCell.Tab.1.center/62.0.1858.1080/1920.37.1680.1010@62.0.1858.1080" timestamp="1608136075752" />
+    <state width="1815" height="363" key="GridCell.Tab.1.center/62.0.1858.1080@62.0.1858.1080" timestamp="1608247758341" />
+    <state width="1784" height="364" key="GridCell.Tab.1.center/93.0.1827.1080/1920.37.1680.1010@93.0.1827.1080" timestamp="1605436172181" />
+    <state width="2423" height="508" key="GridCell.Tab.1.center/93.0.2467.1440/979.2160.1920.1040@93.0.2467.1440" timestamp="1605775998730" />
+    <state width="1815" height="363" key="GridCell.Tab.1.left" timestamp="1608247758341">
+      <screen x="62" y="0" width="1858" height="1080" />
+    </state>
+    <state width="1815" height="363" key="GridCell.Tab.1.left/1982.0.1858.1080/62.0.1858.1080@62.0.1858.1080" timestamp="1608109535772" />
+    <state width="1815" height="363" key="GridCell.Tab.1.left/62.0.1858.1080/1920.37.1680.1010@62.0.1858.1080" timestamp="1608136075752" />
+    <state width="1815" height="363" key="GridCell.Tab.1.left/62.0.1858.1080@62.0.1858.1080" timestamp="1608247758341" />
+    <state width="1784" height="364" key="GridCell.Tab.1.left/93.0.1827.1080/1920.37.1680.1010@93.0.1827.1080" timestamp="1605436172181" />
+    <state width="2423" height="508" key="GridCell.Tab.1.left/93.0.2467.1440/979.2160.1920.1040@93.0.2467.1440" timestamp="1605775998730" />
+    <state width="1815" height="363" key="GridCell.Tab.1.right" timestamp="1608247758341">
+      <screen x="62" y="0" width="1858" height="1080" />
+    </state>
+    <state width="1815" height="363" key="GridCell.Tab.1.right/1982.0.1858.1080/62.0.1858.1080@62.0.1858.1080" timestamp="1608109535772" />
+    <state width="1815" height="363" key="GridCell.Tab.1.right/62.0.1858.1080/1920.37.1680.1010@62.0.1858.1080" timestamp="1608136075752" />
+    <state width="1815" height="363" key="GridCell.Tab.1.right/62.0.1858.1080@62.0.1858.1080" timestamp="1608247758341" />
+    <state width="1784" height="364" key="GridCell.Tab.1.right/93.0.1827.1080/1920.37.1680.1010@93.0.1827.1080" timestamp="1605436172181" />
+    <state width="2423" height="508" key="GridCell.Tab.1.right/93.0.2467.1440/979.2160.1920.1040@93.0.2467.1440" timestamp="1605775998730" />
+    <state x="507" y="184" key="SettingsEditor" timestamp="1605435483030">
+      <screen x="93" y="0" width="1827" height="1080" />
+    </state>
+    <state x="507" y="184" key="SettingsEditor/93.0.1827.1080/1920.37.1680.1010@93.0.1827.1080" timestamp="1605435483030" />
+    <state x="803" y="228" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1605676744336">
+      <screen x="93" y="0" width="1827" height="1080" />
+    </state>
+    <state x="803" y="228" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/93.0.1827.1080@93.0.1827.1080" timestamp="1605676744336" />
+    <state x="62" y="144" width="1813" height="830" key="dock-window-1" timestamp="1608044582926">
+      <screen x="62" y="0" width="1858" height="1080" />
+    </state>
+    <state x="1920" y="172" width="1639" height="776" key="dock-window-1/62.0.1858.1080/1920.37.1680.1010@62.0.1858.1080" timestamp="1608034438635" />
+    <state x="62" y="144" width="1813" height="830" key="dock-window-1/62.0.1858.1080@62.0.1858.1080" timestamp="1608044582926" />
+    <state x="654" y="235" width="672" height="678" key="search.everywhere.popup" timestamp="1608125176787">
+      <screen x="62" y="0" width="1858" height="1080" />
+    </state>
+    <state x="654" y="235" width="672" height="678" key="search.everywhere.popup/1982.0.1858.1080/62.0.1858.1080@62.0.1858.1080" timestamp="1606630453086" />
+    <state x="654" y="235" width="672" height="678" key="search.everywhere.popup/62.0.1858.1080/1920.37.1680.1010@62.0.1858.1080" timestamp="1608125176787" />
+    <state x="654" y="235" width="672" height="678" key="search.everywhere.popup/62.0.1858.1080@62.0.1858.1080" timestamp="1608097721516" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/pybraille$main.coverage" NAME="main Coverage Results" MODIFIED="1608247758323" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/pybraille$namecard.coverage" NAME="namecard Coverage Results" MODIFIED="1608119155525" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../OpenCv/code_sample/opencv_python_ch06_ch10/ch07" />
+    <SUITE FILE_PATH="coverage/pybraille$ser2can.coverage" NAME="ser2can Coverage Results" MODIFIED="1605679355912" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../TX2" />
+    <SUITE FILE_PATH="coverage/pybraille$test.coverage" NAME="test Coverage Results" MODIFIED="1608187578030" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/pybraille$EAST__1_.coverage" NAME="EAST (1) Coverage Results" MODIFIED="1608114413198" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/pybraille$Communication.coverage" NAME="Communication Coverage Results" MODIFIED="1607167586784" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/translator" />
+    <SUITE FILE_PATH="coverage/pybraille$text_cropping.coverage" NAME="text_cropping Coverage Results" MODIFIED="1608130187105" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/lib" />
+    <SUITE FILE_PATH="coverage/pybraille$test2.coverage" NAME="test2 Coverage Results" MODIFIED="1608243409405" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/pybraille$preprocess_img.coverage" NAME="preprocess_img Coverage Results" MODIFIED="1608243294428" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/lib" />
+    <SUITE FILE_PATH="coverage/pybraille$tts.coverage" NAME="tts Coverage Results" MODIFIED="1606287893871" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/translator" />
+  </component>
+</project>
