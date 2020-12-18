@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import pytesseract
 
 def reorderPts(pts):
     idx = np.lexsort((pts[:, 1], pts[:, 0]))  # 칼럼0 -> 칼럼1 순으로 정렬한 인덱스를 반환
@@ -25,7 +26,7 @@ def affine(img):
     # 외곽선 검출 및 명함 검출
     _, contours, _ = cv2.findContours(src_bin, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
-    #cpy = img.copy()
+    cpy = img.copy()
     max_area = 0
     for pts in contours:
         # 너무 작은 객체는 무시
@@ -42,43 +43,24 @@ def affine(img):
             max_area = cv2.contourArea(approx)
         else:
             continue
-        #cv2.polylines(cpy, [approx], True, (0, 255, 0), 2, cv2.LINE_AA)
+        #cpy = cv2.polylines(cpy, [approx], True, (0, 255, 0), 10, cv2.LINE_AA)
         srcQuad = reorderPts(approx.reshape(4, 2).astype(np.float32))
+        #cpy = cv2.drawContours(cpy, srcQuad, 0, (0,255,0), 3)
+        #cv2.imshow('c', cv2.resize(cpy, tuple(x // 4 for x in cpy.shape[:2][::-1])))
 
     pers = cv2.getPerspectiveTransform(srcQuad, dstQuad)
     dst = cv2.warpPerspective(img, pers, (w, h))
     return dst
 
-def refine(img):
-    # dst = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    # dst = cv2.medianBlur(dst,1)
-    # # >> High Contrast
-    # alpha = 1
-    # dst = dst + (dst-170)*alpha
-    dst = dilate()
-    return dst
-
-def dilate(ary, N, iterations):
-    """Dilate using an NxN '+' sign shape. ary is np.uint8."""
-    kernel = np.zeros((N, N), dtype=np.uint8)
-    kernel[(N - 1) // 2, :] = 1
-    dilated_image = cv2.dilate(ary / 255, kernel, iterations=iterations)
-
-    kernel = np.zeros((N, N), dtype=np.uint8)
-    kernel[:, (N - 1) // 2] = 1
-    dilated_image = cv2.dilate(dilated_image, kernel, iterations=iterations)
-    dilated_image = cv2.convertScaleAbs(dilated_image) #
-    return dilated_image
-
 def process(img):
-    cv2.imshow('origin', cv2.resize(img, tuple(x // 4 for x in img.shape[:2][::-1])))
+    #cv2.imshow('origin', cv2.resize(img, tuple(x // 4 for x in img.shape[:2][::-1])))
     img = affine(img)
-    cv2.imshow('affined', cv2.resize(img, tuple(x // 4 for x in img.shape[:2][::-1])))
-    img = refine(img)
-    cv2.imshow('refined', cv2.resize(img, tuple(x//4 for x in img.shape[:2][::-1])))
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    #cv2.imshow('affined', cv2.resize(img, tuple(x // 4 for x in img.shape[:2][::-1])))
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
+    #text = pytesseract.image_to_string(img, lang='kor', config='--psm 1 -c preserve_interword_spaces=1 --oem 1')
+    #print(text)
     return img
 
 
-#process(cv2.imread('../s0.png'))
+#process(cv2.imread('../s3.jpg'))

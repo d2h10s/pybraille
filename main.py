@@ -80,10 +80,7 @@ class ocrWidget(QWidget):
         self.resize(width, height+34) # set window size
         main.center()
         self.show()
-        self.cap = cv2.VideoCapture(0)
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
-        self.cap.release()
+        self.cap = cv2.VideoCapture()
 
     def __del__(self):
         if self.cap.isOpened():
@@ -122,28 +119,30 @@ class ocrWidget(QWidget):
         self.isCamRun = True
         self.camEnd = False
         self.camAction.setIcon(QIcon('icon/cam_green.png'))
-        try:
-            self.cap.open(0)
-            width, height = 640, 480
-            self.resize(width, height + 34)  # set window size
-            self.lbl_pic.resize(width, height)
-            while self.isCamRun:
-                ret, self.img = self.cap.read()
-                if not ret:
-                    mainWindow.msgbox(self, seticon=QMessageBox.Critical, title='오류', text='카메라를 작동할 수 없습니다.', btn=QMessageBox.Ok)
-                    print('can\'t open camera')
-                    self.isCamRun = False
-                    break
+        # try:
+        self.cap = cv2.VideoCapture(0 + cv2.CAP_DSHOW)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+        width, height = 640, 480
+        self.resize(width, height + 34)  # set window size
+        self.lbl_pic.resize(width, height)
+        while self.isCamRun:
+            ret, self.img = self.cap.read()
+            if not ret:
+                mainWindow.msgbox(self, seticon=QMessageBox.Critical, title='오류', text='카메라를 작동할 수 없습니다.', btn=QMessageBox.Ok)
+                print('can\'t open camera')
+                self.isCamRun = False
+                break
 
-                img = cv2.resize(self.img, (640, 640 * self.img.shape[0] // self.img.shape[1]))
-                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                h, w, c = img.shape
-                qImg = QImage(img.data, w, h, w * c, QImage.Format_RGB888)
-                pixmap = QPixmap.fromImage(qImg)
-                self.lbl_pic.setPixmap(pixmap)
-        except:
-            mainWindow.msgbox(self, QMessageBox.Information, '오류', '카메라 오류가 발생하였습니다.', QMessageBox.Ok)
-            print('cam error occured')
+            img = cv2.resize(self.img, (640, 640 * self.img.shape[0] // self.img.shape[1]))
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            h, w, c = img.shape
+            qImg = QImage(img.data, w, h, w * c, QImage.Format_RGB888)
+            pixmap = QPixmap.fromImage(qImg)
+            self.lbl_pic.setPixmap(pixmap)
+        # except:
+        #     mainWindow.msgbox(self, QMessageBox.Information, '오류', '카메라 오류가 발생하였습니다.', QMessageBox.Ok)
+        #     print('cam error occured')
         self.cap.release()
         self.camAction.setIcon(QIcon('icon/cam.png'))
         print('cam end')
@@ -156,10 +155,13 @@ class ocrWidget(QWidget):
             return
         if self.isCamRun:
             self.isCamRun = False
+        print('ocr start')
         self.camAction.setIcon(QIcon('icon/cam.png'))
         self.img = process(self.img)
-        text = pytesseract.image_to_string(self.img, lang='kor', config='--psm 1 -c preserve_interword_spaces=1')
+        text = pytesseract.image_to_string(self.img, lang='kor', config='--psm 1 -c preserve_interword_spaces=1 --oem 1')
         self.main.centralWidget.te.setText(text)
+        #cv2.imshow('origin', self.img)
+        print('ocr end')
 
     def ccwRotate(self):
         if self.img.size == 0:

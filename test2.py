@@ -2,15 +2,13 @@ import glob
 import os
 import sys
 import random
-from lib.preprocess_img import process
 import cv2
-from PIL import Image, ImageDraw
 import numpy as np
+from lib.preprocess_img import process
 from scipy.ndimage.filters import rank_filter
-
+import pytesseract
 
 def dilate(ary, N, iterations):
-    """Dilate using an NxN '+' sign shape. ary is np.uint8."""
     kernel = np.zeros((N, N), dtype=np.uint8)
     kernel[(N - 1) // 2, :] = 1
     dilated_image = cv2.dilate(ary / 255, kernel, iterations=iterations)
@@ -19,11 +17,11 @@ def dilate(ary, N, iterations):
     kernel[:, (N - 1) // 2] = 1
     dilated_image = cv2.dilate(dilated_image, kernel, iterations=iterations)
     dilated_image = cv2.convertScaleAbs(dilated_image) #
+    cv2.imshow('a', cv2.resize(dilated_image, tuple(x // 4 for x in dilated_image.shape[:2][::-1])))
     return dilated_image
 
 
 def props_for_contours(contours, ary):
-    """Calculate bounding box & the number of set pixels for each contour."""
     c_info = []
     for c in contours:
         x, y, w, h = cv2.boundingRect(c)
@@ -72,10 +70,6 @@ def angle_from_right(deg):
 
 
 def remove_border(contour, ary):
-    """Remove everything outside a border contour."""
-    # Use a rotated rectangle (should be a good approximation of a border).
-    # If it's far from a right angle, it's probably two sides of a border and
-    # we should use the bounding box instead.
     c_im = np.zeros(ary.shape)
     r = cv2.minAreaRect(contour)
     degs = r[2]
@@ -93,28 +87,18 @@ def remove_border(contour, ary):
 
 
 def find_components(edges, max_components=16):
-    """Dilate the image until there are just a few connected components.
-    Returns contours for these components."""
-    # Perform increasingly aggressive dilation until there are just a few
-    # connected components.
     count = 21
     dilation = 5
     n = 1
     while count > 16:
         n += 1
         dilated_image = dilate(edges, N=3, iterations=n)
-        contours, hierarchy = cv2.findContours(dilated_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        _, contours, *_ = cv2.findContours(dilated_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         count = len(contours)
-    # print dilation
-    # Image.fromarray(edges).show()
-    # Image.fromarray(255 * dilated_image).show()
     return contours
 
 
 def find_optimal_components_subset(contours, edges):
-    """Find a crop which strikes a good balance of coverage/compactness.
-    Returns an (x1, y1, x2, y2) tuple.
-    """
     c_info = props_for_contours(contours, edges)
     c_info.sort(key=lambda x: -x['sum'])
     total = np.sum(edges) / 255
@@ -131,7 +115,6 @@ def find_optimal_components_subset(contours, edges):
         recall = 1.0 * covered_sum / total
         prec = 1 - 1.0 * crop_area(crop) / area
         f1 = 2 * (prec * recall / (prec + recall))
-        # print '----'
         for i, c in enumerate(c_info):
             this_crop = c['x1'], c['y1'], c['x2'], c['y2']
             new_crop = union_crops(crop, this_crop)
@@ -140,9 +123,6 @@ def find_optimal_components_subset(contours, edges):
             new_prec = 1 - 1.0 * crop_area(new_crop) / area
             new_f1 = 2 * new_prec * new_recall / (new_prec + new_recall)
 
-            # Add this crop if it improves f1 score,
-            # _or_ it adds 25% of the remaining pixels for <15% crop expansion.
-            # ^^^ very ad-hoc! make this smoother
             remaining_frac = c['sum'] / (total - covered_sum)
             new_area_frac = 1.0 * crop_area(new_crop) / crop_area(crop) - 1
             if new_f1 > f1 or (
@@ -164,10 +144,6 @@ def find_optimal_components_subset(contours, edges):
 
 
 def pad_crop(crop, contours, edges, border_contour, pad_px=15):
-    """Slightly expand the crop to get full contours.
-    This will expand to include any contours it currently intersects, but will
-    not expand past a border.
-    """
     bx1, by1, bx2, by2 = 0, 0, edges.shape[0], edges.shape[1]
     if border_contour is not None and len(border_contour) > 0:
         c = props_for_contours([border_contour], edges)[0]
@@ -202,9 +178,6 @@ def pad_crop(crop, contours, edges, border_contour, pad_px=15):
 
 
 def downscale_image(im, max_dim=2048):
-    """Shrink im until its longest dimension is <= max_dim.
-    Returns new_image, scale (where scale <= 1).
-    """
     a, b, *_ = im.shape
     if max(a, b) <= max_dim:
         return 1.0, im
@@ -217,8 +190,9 @@ def downscale_image(im, max_dim=2048):
 
 
 def process_image(orig_im):
+    cv2.imshow('origin', cv2.resize(orig_im, tuple(x//4 for x in orig_im.shape[:2][::-1])))
+    orig_im = process(orig_im.copy())
     scale, im = downscale_image(orig_im)
-
     edges = cv2.Canny(np.uint8(im), 100, 200)
 
     # TODO: dilate image _before_ finding a border. This is crazy sensitive!
@@ -241,37 +215,21 @@ def process_image(orig_im):
 
     contours = find_components(edges)
     if len(contours) == 0:
-        print('%s -> (no text!)' % path)
         return
 
     crop = find_optimal_components_subset(contours, edges)
     crop = pad_crop(crop, contours, edges, border_contour)
 
     crop = [int(x / scale) for x in crop]  # upscale to the original image size.
-    # draw = ImageDraw.Draw(im)
-    # c_info = props_for_contours(contours, edges)
-    # for c in c_info:
-    #    this_crop = c['x1'], c['y1'], c['x2'], c['y2']
-    #    draw.rectangle(this_crop, outline='blue')
-    # draw.rectangle(crop, outline='red')
-    # im.save(out_path)
-    # draw.text((50, 50), path, fill='red')
-    # orig_im.save(out_path)
-    # im.show()
     rgb_im = cv2.cvtColor(orig_im, cv2.COLOR_BGR2RGB)
-    # print(crop)
-    # draw = ImageDraw.Draw(rgb_im)
-    # draw.rectangle(crop, outline='red')
-    # rgb_im.show()
-    #
-    # text_im = orig_im.crop(crop)
-    # text_im.show()
-    # text_im.save(out_path)
-    # print('%s -> %s' % (path, out_path))
     x1, y1, x2, y2 = crop
     cropped = rgb_im[y1:y2, x1:x2]
-    cv2.resize(cropped, tuple(x//4 for x in cropped.shape[:2][::-1]))
-    cv2.imshow('c', cropped)
-    cv2.waitKey(0)
 
-process_image()
+    cv2.imshow('c', cv2.resize(cropped, tuple(x//4 for x in cropped.shape[:2][::-1])))
+    cv2.waitKey(0)
+    return cropped
+
+img= process_image(cv2.imread('s2.jpg'))
+#img = cv2.imread('s3.jpg')
+text = pytesseract.image_to_string(img, lang='kor', config='--psm 1 -c preserve_interword_spaces=1 --oem 1')
+#print(text)
