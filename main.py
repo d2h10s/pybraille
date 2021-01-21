@@ -67,7 +67,7 @@ class ocrWidget(QWidget):
 
         # environment variable settings
         if not 'Tesseract' in os.environ.get('path'):
-            os.environ['path'].append(r'C:\Program Files\Tesseract-OCR\tesseract')
+            os.environ['path'] = r'C:\Program Files\Tesseract-OCR\tesseract'
             print('tesseract environment variable appended')
 
         if not os.environ.get('TESSDATA_PREFIX'):
@@ -160,7 +160,7 @@ class ocrWidget(QWidget):
         self.img = process(self.img)
         text = pytesseract.image_to_string(self.img, lang='kor', config='--psm 1 -c preserve_interword_spaces=1 --oem 1')
         self.main.centralWidget.te.setText(text)
-        #cv2.imshow('origin', self.img)
+        # cv2.imshow('origin', self.img)
         print('ocr end')
 
     def ccwRotate(self):
@@ -188,6 +188,7 @@ class ocrWidget(QWidget):
         qImg = QImage(img.data, w, h, w * c, QImage.Format_RGB888)
         pixmap = QPixmap.fromImage(qImg)
         self.lbl_pic.setPixmap(pixmap)
+
 
 class historyWidget(QWidget):
     def __init__(self):
@@ -252,6 +253,7 @@ class historyWidget(QWidget):
         playsound('data_tts/' + self.fname)
         lock.release()
         print('thread exit')
+
 
 class centWidget(QWidget):
     def __init__(self):
