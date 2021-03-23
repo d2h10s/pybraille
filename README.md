@@ -4,7 +4,7 @@
 텍스트 편집, 자동 한글->점자 변환기, TTS, OCR 기능이 포함되어 있습니다.<br>
 <br>
 점자 프린터는 ARM Cortex-M4 프로세서가 사용 되었으며, SW는 mbed-os 2.0을 기반으로 제작되었습니다.<br>
-<a href="https://github.com/d2h10s/braille_mbed"><img src="http://img.shields.io/badge/-Go to MBED Code-A8B9CC?style=flat-square&logo=c%2b%2b&logoColor=white"></a>
+<a href="https://github.com/d2h10s/pybraille/mbed"><img src="http://img.shields.io/badge/-Go to MBED Code-A8B9CC?style=flat-square&logo=c%2b%2b&logoColor=white"></a>
 
 ## SW Manual
 <img src="img/manual_v1_3.png">
