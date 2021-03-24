@@ -10,7 +10,23 @@
 <img src="img/manual_v1_3.png">
 이 매뉴얼의 버전은 1.3로 최신 매뉴얼은 1.4입니다.<br>
 차후 업데이터 예정입니다.
-<!--
+
+## Debugging
+본 프로그램에는 디버깅용 콘솔이 포함되어 있으며 통신 상황을 모니터링 할 수 있습니다.
+<img src="img/debugging.png">
+
+## 점역 알고리즘
+<img src="img/braille_translate_algorithm.png">
+
+## 점자 유니코드 serialization 알고리즘
+<img src="img/braille_to_dot_algorithm.png">
+
+## Serial 장치 자동 탐색 알고리즘
+<img src="img/serial_algorithm.png">
+
+## 통신 프로토콜 프레임
+<img src="img/protocol_base.png">
+
 ## Shape
 <p align="center">
     <img src="img/isometric.png" ><br>
@@ -36,4 +52,3 @@
 <p align="center">
     <img src="img/schematic.png">
 </p>
--->
